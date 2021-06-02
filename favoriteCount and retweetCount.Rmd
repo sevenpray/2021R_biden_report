@@ -1,0 +1,69 @@
+---
+title: '推文在一天中哪些特定時間段的轉推數跟喜歡數比較多？'
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+load("~/biden_tweets_df.rda")
+
+#整理表格
+new_biden <- biden_tweets_df %>%
+    select(created, favoriteCount, retweetCount) %>% 
+    separate(created, c("date", "time")," " ) %>%
+    separate(time,c("hour","minute","second")) %>%
+    select(hour,favoriteCount, retweetCount) %>%
+    group_by(hour) %>%
+    summarise(number=n(), sum_favoriteCount=sum(favoriteCount), mean_favoriteCount=mean(favoriteCount), sum_retweetCount=sum(retweetCount), mean_retweetCount=mean(retweetCount))
+
+#新表格
+new_biden
+
+#發文數量
+new_biden %>%
+    select(hour,number) %>%
+    arrange(desc(number))
+
+#發文數量長條圖
+ggplot(new_biden)+
+    geom_bar(aes(hour,number), stat = "identity") 
+
+#喜歡數加總排序
+new_biden %>%
+    select(hour,sum_favoriteCount) %>%
+    arrange(desc(sum_favoriteCount))
+
+#喜歡數加總長條圖
+ggplot(new_biden)+
+    geom_bar(aes(hour, sum_favoriteCount), stat = "identity", fill="lightblue")
+
+#喜歡數平均數排序
+new_biden %>%
+    select(hour,mean_favoriteCount) %>%
+    arrange(desc(mean_favoriteCount))
+
+#喜歡數平均數長條圖
+ggplot(new_biden)+
+    geom_bar(aes(hour, mean_favoriteCount,fill="blue"), stat = "identity", fill="lightblue")
+
+#轉推數加總數排序
+new_biden %>%
+    select(hour,sum_retweetCount) %>%
+    arrange(desc(sum_retweetCount))
+
+#轉推數加總數長條圖
+ggplot(new_biden)+
+    geom_bar(aes(hour,sum_retweetCount), stat = "identity")
+
+#轉推數平均數排序
+new_biden %>%
+    select(hour,mean_retweetCount) %>%
+    arrange(desc(mean_retweetCount))
+
+#轉推數平均數長條圖
+ggplot(new_biden)+
+    geom_bar(aes(hour, mean_retweetCount), stat = "identity") 
+
+```
+
+
