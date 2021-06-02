@@ -29,7 +29,9 @@ df %>%
     group_by(source) %>% 
     summarise(count = n()) %>% 
     ggplot() + 
-    geom_bar(aes(x = source, y = count), stat = "identity")
+    geom_bar(aes(x = source, y = count), stat = "identity") + 
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1, size = rel(0.75))) + 
+    labs(x = "")
 
 
 
