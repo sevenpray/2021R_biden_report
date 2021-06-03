@@ -32,14 +32,20 @@ biden_tweets_df <- biden_tweets_df %>%
     select(id, source, text, created, favoriteCount, retweetCount) %>%
     arrange(source, desc())
 
-#詞頻與喜歡數、轉推數的關係
+#關鍵字與喜歡數、轉推數的關係
 reg <- "([^A-Za-z\\d#@']|'(?![A-Za-z\\d#@]))"
 tweet_words <- biden_tweets_df %>%
     filter(!str_detect(text, '^"')) %>%
     mutate(text = str_replace_all(text, "https://t.co/[A-Za-z\\d]+|&amp;", "")) %>%
     unnest_tokens(word, text, token = "regex", pattern = reg) %>%
     filter(!word %in% stop_words$word,
-           str_detect(word, "[a-z]"))
+           str_detect(word, "[a-z]")) %>%
+    arrange(desc(favoriteCount))
+
+tweet_words %>%
+    head(20) %>%
+    group_by(favoriteCount) %>%
+
 
 #詞頻圖
 tweet_words %>%
