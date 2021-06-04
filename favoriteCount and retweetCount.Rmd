@@ -5,16 +5,23 @@ output: html_document
 
 ```{r}
 library(tidyverse)
+library(ggplot2)
+library(lubridate)
+library(scales)
 load("~/biden_tweets_df.rda")
 
+```
+
+
+```{r}
 #整理表格
+#原本爬下來的時間看起來是+0的時區，大神code把它轉成美東，我把它改成台灣時間，轉換後與網站看到的一樣
 new_biden <- biden_tweets_df %>%
-    select(created, favoriteCount, retweetCount) %>% 
-    separate(created, c("date", "time")," " ) %>%
-    separate(time,c("hour","minute","second")) %>%
-    select(hour,favoriteCount, retweetCount) %>%
+    mutate(hour = hour(with_tz(created, "Asia/Taipei"))) %>%
     group_by(hour) %>%
-    summarise(number=n(), sum_favoriteCount=sum(favoriteCount), mean_favoriteCount=mean(favoriteCount), sum_retweetCount=sum(retweetCount), mean_retweetCount=mean(retweetCount))
+    summarise(number=n(), sum_favoriteCount=sum(favoriteCount), mean_favoriteCount=mean(favoriteCount), sum_retweetCount=sum(retweetCount), mean_retweetCount=mean(retweetCount))%>%
+    arrange(desc(number))
+
 
 #新表格
 new_biden
@@ -63,6 +70,16 @@ new_biden %>%
 #轉推數平均數長條圖
 ggplot(new_biden)+
     geom_bar(aes(hour, mean_retweetCount), stat = "identity") 
+
+#喜歡數轉推平均折線圖
+ggplot(new_biden)+
+    geom_line(aes(hour, mean_favoriteCount), color="blue")+
+    geom_line(aes(hour, mean_retweetCount))
+
+#喜歡數轉推總和折線圖
+ggplot(new_biden)+
+    geom_line(aes(hour, sum_favoriteCount), color="blue", )+
+    geom_line(aes(hour, sum_retweetCount))
 
 ```
 
