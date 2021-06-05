@@ -1,0 +1,168 @@
+---
+title: "Sentiment Analysis (Macro)"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Import libraries
+```{r}
+library(dplyr)
+library(tibble)
+library(ggplot2)
+library(stringr)
+library(tidyr)
+library(lubridate)
+library(scales)
+library(tidytext)
+library(textdata)
+```
+
+Load the dataset
+```{r}
+load(file = "biden_tweets_df.rda")
+```
+
+Mutate "source" column and select some columns
+```{r}
+df <- biden_tweets_df %>% 
+    mutate(source = sapply(biden_tweets_df$statusSource , function(x) {
+        if (str_detect(x, pattern = "Twitter Web App")) return("Twitter Web App")
+        else if (str_detect(x, pattern = "Periscope")) return("Periscope")
+        else if (str_detect(x, pattern = "Twitter Media Studio")) return("Twitter Media Studio")
+        else if (str_detect(x, pattern = "Sprinklr")) return("Sprinklr")
+        else return("The White House")
+    })) %>% select(id, source, text, created, retweetCount, favoriteCount)
+```
+
+Collect tweet words
+```{r}
+reg <- "([^A-Za-z\\d#@']|'(?![A-Za-z\\d#@]))"
+tweet_words <- df %>%
+    filter(!str_detect(text, '^"')) %>%
+    mutate(text = str_replace_all(text, "https://t.co/[A-Za-z\\d]+|&amp;", "")) %>%
+    unnest_tokens(word, text, token = "regex", pattern = reg) %>%
+    filter(!word %in% stop_words$word,
+           str_detect(word, "[a-z]")) %>%
+    arrange(desc(favoriteCount))
+```
+
+```{r}
+sentiment_overview <- tweet_words %>%
+    inner_join(get_sentiments("nrc")) %>%
+    filter(!is.na(sentiment)) %>%
+    count(sentiment, sort = TRUE)
+
+sentiment_overview
+```
+
+```{r}
+nrc_word_counts <- tweet_words %>%
+  inner_join(get_sentiments("nrc")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  ungroup()
+
+nrc_word_counts
+```
+
+Common positive words
+```{r}
+nrc_positive <- get_sentiments("nrc") %>% 
+  filter(sentiment == "positive")
+
+tweet_words %>%
+  inner_join(nrc_positive) %>%
+  count(word, sort = TRUE)
+```
+
+Common trust words
+```{r}
+nrc_trust <- get_sentiments("nrc") %>% 
+  filter(sentiment == "trust")
+
+tweet_words %>%
+  inner_join(nrc_trust) %>%
+  count(word, sort = TRUE)
+```
+
+Common anticipation words
+```{r}
+nrc_anticipation <- get_sentiments("nrc") %>% 
+  filter(sentiment == "anticipation")
+
+tweet_words %>%
+  inner_join(nrc_anticipation) %>%
+  count(word, sort = TRUE)
+```
+
+Common negative words
+```{r}
+nrc_negative <- get_sentiments("nrc") %>% 
+  filter(sentiment == "negative")
+
+tweet_words %>%
+  inner_join(nrc_negative) %>%
+  count(word, sort = TRUE)
+```
+
+Common joy words
+```{r}
+nrc_joy <- get_sentiments("nrc") %>% 
+  filter(sentiment == "joy")
+
+tweet_words %>%
+  inner_join(nrc_joy) %>%
+  count(word, sort = TRUE)
+```
+
+Common fear words
+```{r}
+nrc_fear <- get_sentiments("nrc") %>% 
+  filter(sentiment == "fear")
+
+tweet_words %>%
+  inner_join(nrc_fear) %>%
+  count(word, sort = TRUE)
+```
+
+Common sadness words
+```{r}
+nrc_sadness <- get_sentiments("nrc") %>% 
+  filter(sentiment == "sadness")
+
+tweet_words %>%
+  inner_join(nrc_sadness) %>%
+  count(word, sort = TRUE)
+```
+
+Common anger words
+```{r}
+nrc_anger <- get_sentiments("nrc") %>% 
+  filter(sentiment == "anger")
+
+tweet_words %>%
+  inner_join(nrc_anger) %>%
+  count(word, sort = TRUE)
+```
+
+Common surprise words
+```{r}
+nrc_surprise <- get_sentiments("nrc") %>% 
+  filter(sentiment == "surprise")
+
+tweet_words %>%
+  inner_join(nrc_surprise) %>%
+  count(word, sort = TRUE)
+```
+
+Common disgust words
+```{r}
+nrc_disgust <- get_sentiments("nrc") %>% 
+  filter(sentiment == "disgust")
+
+tweet_words %>%
+  inner_join(nrc_fear) %>%
+  count(word, sort = TRUE)
+```
