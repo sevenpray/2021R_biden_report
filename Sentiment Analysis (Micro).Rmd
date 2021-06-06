@@ -65,6 +65,11 @@ sentiment_overview <- favorite_words %>%
     count(sentiment, sort = TRUE)
 
 sentiment_overview
+
+sentiment_overview %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = sentiment), stat = "identity") + 
+  labs(x = "Count")
 ```
 
 ```{r}
@@ -74,6 +79,14 @@ nrc_word_counts <- favorite_words %>%
   ungroup()
 
 nrc_word_counts
+
+nrc_word_counts %>% 
+  filter(n > 1) %>%
+  ggplot() +
+  geom_histogram(aes(x = n, y = word), stat = "identity") +
+  facet_wrap(vars(sentiment), scales = "free") + 
+  theme(axis.text.y = element_text(size = rel(0.75))) + 
+  labs(x = "Count", y = "", title = "Words of each Sentiment")
 ```
 
 Common positive words
@@ -81,9 +94,17 @@ Common positive words
 nrc_positive <- get_sentiments("nrc") %>% 
   filter(sentiment == "positive")
 
-favorite_words %>%
+positive_words = favorite_words %>%
   inner_join(nrc_positive) %>%
   count(word, sort = TRUE)
+
+positive_words
+
+positive_words %>% 
+  filter(n > 1) %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Positive")
 ```
 
 Common trust words
@@ -91,9 +112,17 @@ Common trust words
 nrc_trust <- get_sentiments("nrc") %>% 
   filter(sentiment == "trust")
 
-favorite_words %>%
+trust_words = favorite_words %>%
   inner_join(nrc_trust) %>%
   count(word, sort = TRUE)
+
+trust_words
+
+trust_words %>% 
+  filter(n > 1) %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Trust")
 ```
 
 Common anticipation words
@@ -101,9 +130,17 @@ Common anticipation words
 nrc_anticipation <- get_sentiments("nrc") %>% 
   filter(sentiment == "anticipation")
 
-favorite_words %>%
+anticipation_words = favorite_words %>%
   inner_join(nrc_anticipation) %>%
   count(word, sort = TRUE)
+
+anticipation_words
+
+anticipation_words %>% 
+  head() %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Anticipation")
 ```
 
 Common negative words
@@ -111,9 +148,17 @@ Common negative words
 nrc_negative <- get_sentiments("nrc") %>% 
   filter(sentiment == "negative")
 
-favorite_words %>%
+negative_words = favorite_words %>%
   inner_join(nrc_negative) %>%
   count(word, sort = TRUE)
+
+negative_words
+
+negative_words %>% 
+  head() %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Negative")
 ```
 
 Common joy words
@@ -121,9 +166,17 @@ Common joy words
 nrc_joy <- get_sentiments("nrc") %>% 
   filter(sentiment == "joy")
 
-favorite_words %>%
+joy_words = favorite_words %>%
   inner_join(nrc_joy) %>%
   count(word, sort = TRUE)
+
+joy_words
+
+joy_words %>% 
+  head() %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Joy")
 ```
 
 Common fear words
@@ -131,9 +184,17 @@ Common fear words
 nrc_fear <- get_sentiments("nrc") %>% 
   filter(sentiment == "fear")
 
-favorite_words %>%
+fear_words = favorite_words %>%
   inner_join(nrc_fear) %>%
   count(word, sort = TRUE)
+
+fear_words
+
+fear_words %>% 
+  head() %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Fear")
 ```
 
 Common sadness words
@@ -141,9 +202,16 @@ Common sadness words
 nrc_sadness <- get_sentiments("nrc") %>% 
   filter(sentiment == "sadness")
 
-favorite_words %>%
+sadness_words = favorite_words %>%
   inner_join(nrc_sadness) %>%
   count(word, sort = TRUE)
+
+sadness_words
+
+sadness_words %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Sadness")
 ```
 
 Common anger words
@@ -151,9 +219,16 @@ Common anger words
 nrc_anger <- get_sentiments("nrc") %>% 
   filter(sentiment == "anger")
 
-favorite_words %>%
+anger_words = favorite_words %>%
   inner_join(nrc_anger) %>%
   count(word, sort = TRUE)
+
+anger_words
+
+anger_words %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Anger")
 ```
 
 Common surprise words
@@ -161,9 +236,16 @@ Common surprise words
 nrc_surprise <- get_sentiments("nrc") %>% 
   filter(sentiment == "surprise")
 
-favorite_words %>%
+surprise_words = favorite_words %>%
   inner_join(nrc_surprise) %>%
   count(word, sort = TRUE)
+
+surprise_words
+
+surprise_words %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Surprise")
 ```
 
 Common disgust words
@@ -171,7 +253,15 @@ Common disgust words
 nrc_disgust <- get_sentiments("nrc") %>% 
   filter(sentiment == "disgust")
 
-favorite_words %>%
+disgust_words = favorite_words %>%
   inner_join(nrc_fear) %>%
   count(word, sort = TRUE)
+
+disgust_words
+
+disgust_words %>% 
+  head() %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Disgust")
 ```
