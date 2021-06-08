@@ -58,7 +58,8 @@ sentiment_overview <- tweet_words %>%
 sentiment_overview
 
 ggplot(sentiment_overview) + 
-  geom_bar(aes(x = n, y = sentiment), stat = "identity")
+  geom_bar(aes(x = reorder(sentiment, n), y = n), stat = "identity") +
+  coord_flip()
 ```
 
 ```{r}
@@ -75,10 +76,11 @@ nrc_word_counts %>%
   arrange(desc(n)) %>% 
   ungroup() %>%
   ggplot() +
-  geom_histogram(aes(x = n, y = word), stat = "identity") +
+  geom_histogram(aes(x = reorder(word, n), y = n), stat = "identity", width = 0.75) +
+  coord_flip() +
   facet_wrap(vars(sentiment), scales = "free") + 
   theme(axis.text.y = element_text(size = rel(0.75))) + 
-  labs(x = "Count", y = "", title = "Words of each Sentiment")
+  labs(x = "Word", y = "", title = "Frequency of Occurrence by Sentiment")
 ```
 
 Common positive words
@@ -95,7 +97,8 @@ positive_words
 positive_words %>% 
   top_n(10, n) %>% 
   ggplot() + 
-  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  geom_bar(aes(x = reorder(word, n), y = n), stat = "identity") + 
+  coord_flip() +
   labs(x = "Count", y = "", title = "Words of Positive")
   
 ```
@@ -114,7 +117,8 @@ trust_words
 trust_words %>% 
   top_n(10, n) %>% 
   ggplot() + 
-  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  geom_bar(aes(x = reorder(word, n), y = n), stat = "identity") + 
+  coord_flip() +
   labs(x = "Count", y = "", title = "Words of Trust")
 ```
 
@@ -132,7 +136,8 @@ anticipation_words
 anticipation_words %>% 
   top_n(10, n) %>% 
   ggplot() + 
-  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  geom_bar(aes(x = reorder(word, n), y = n), stat = "identity") + 
+  coord_flip() +
   labs(x = "Count", y = "", title = "Words of Anticipation")
 ```
 
@@ -150,7 +155,8 @@ negative_words
 negative_words %>% 
   top_n(10, n) %>% 
   ggplot() + 
-  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  geom_bar(aes(x = reorder(word, n), y = n), stat = "identity") + 
+  coord_flip() +
   labs(x = "Count", y = "", title = "Words of Negative")
 ```
 
@@ -168,7 +174,8 @@ joy_words
 joy_words %>% 
   top_n(10, n) %>% 
   ggplot() + 
-  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  geom_bar(aes(x = reorder(word, n), y = n), stat = "identity") + 
+  coord_flip() +
   labs(x = "Count", y = "", title = "Words of Joy")
 ```
 
@@ -186,7 +193,8 @@ fear_words
 fear_words %>% 
   top_n(10, n) %>% 
   ggplot() + 
-  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  geom_bar(aes(x = reorder(word, n), y = n), stat = "identity") + 
+  coord_flip() +
   labs(x = "Count", y = "", title = "Words of Fear")
 ```
 
@@ -204,7 +212,8 @@ sadness_words
 sadness_words %>% 
   top_n(10, n) %>% 
   ggplot() + 
-  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  geom_bar(aes(x = reorder(word, n), y = n), stat = "identity") + 
+  coord_flip() +
   labs(x = "Count", y = "", title = "Words of Sadness")
 ```
 
@@ -222,7 +231,8 @@ anger_words
 anger_words %>% 
   top_n(10, n) %>% 
   ggplot() + 
-  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  geom_bar(aes(x = reorder(word, n), y = n), stat = "identity") + 
+  coord_flip() +
   labs(x = "Count", y = "", title = "Words of Anger")
 ```
 
@@ -240,7 +250,8 @@ surprise_words
 surprise_words %>% 
   top_n(10, n) %>% 
   ggplot() + 
-  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  geom_bar(aes(x = reorder(word, n), y = n), stat = "identity") + 
+  coord_flip() +
   labs(x = "Count", y = "", title = "Words of Surprise")
 ```
 
@@ -258,6 +269,7 @@ disgust_words
 disgust_words %>% 
   top_n(10, n) %>% 
   ggplot() + 
-  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  geom_bar(aes(x = reorder(word, n), y = n), stat = "identity") + 
+  coord_flip() +
   labs(x = "Count", y = "", title = "Words of Disgust")
 ```

@@ -68,8 +68,8 @@ sentiment_overview
 
 sentiment_overview %>% 
   ggplot() + 
-  geom_bar(aes(x = n, y = sentiment), stat = "identity") + 
-  labs(x = "Count")
+  geom_bar(aes(x = reorder(sentiment, n), y = n), stat = "identity") +
+  coord_flip()
 ```
 
 ```{r}
@@ -83,10 +83,11 @@ nrc_word_counts
 nrc_word_counts %>% 
   filter(n > 1) %>%
   ggplot() +
-  geom_histogram(aes(x = n, y = word), stat = "identity") +
+  geom_histogram(aes(x = reorder(word, n), y = n), stat = "identity", width = 0.75) +
+  coord_flip() +
   facet_wrap(vars(sentiment), scales = "free") + 
   theme(axis.text.y = element_text(size = rel(0.75))) + 
-  labs(x = "Count", y = "", title = "Words of each Sentiment")
+  labs(x = "Word", y = "", title = "Words with Top Fifty FavoriteCount by Sentiment")
 ```
 
 Common positive words
