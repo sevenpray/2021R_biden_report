@@ -46,11 +46,11 @@ load(file = "biden_tweets_df.rda")
 # Mutate source column and select other meaningful columns
 df <- biden_tweets_df %>% 
     mutate(source = sapply(biden_tweets_df$statusSource , function(x) {
-        if (str_detect(x, pattern = "Twitter Web App")) return("Twitter Web App")
+        if (str_detect(x, pattern = "Twitter Web App")) return("Twitter_Web_App")
         else if (str_detect(x, pattern = "Periscope")) return("Periscope")
-        else if (str_detect(x, pattern = "Twitter Media Studio")) return("Twitter Media Studio")
+        else if (str_detect(x, pattern = "Twitter Media Studio")) return("Twitter_Media_Studio")
         else if (str_detect(x, pattern = "Sprinklr")) return("Sprinklr")
-        else return("The White House")
+        else return("The_White_House")
     })) %>% 
     select(id, source, text, created, retweetCount, favoriteCount) %>%
     mutate(hour = hour(with_tz(created, "EST")))
@@ -69,9 +69,22 @@ tweet_words <- df %>%
     arrange(desc(favoriteCount))
 ```
 
-## Timeline
+## Time line
+
+### Time line of retweetCount and FavoriteCount from Feb to May
 
 ```{r}
+
+ggplot(data = df) + 
+    geom_col(mapping = aes(x = created, y = retweetCount, color = source))
+
+ggplot(data = df) + 
+    geom_col(mapping = aes(x = created, y = favoriteCount, color = source))
+```
+
+### Tweeting in Hour of a Day
+
+```{r message=FALSE, warning=FALSE}
 tweeting_hour <- df %>% 
     group_by(hour) %>%
     summarise(number=n(), 
@@ -93,27 +106,51 @@ p1 <- df %>%
     ggplot(mapping = aes(hour, percent)) + 
     geom_line() + 
     scale_y_continuous(labels = percent_format()) + 
-    labs(x = "Hour of day", y = "% of tweets")
+    labs(x = "Hour of a day", y = "% of tweets")
 
 p2 <- ggplot(tweeting_hour) + 
     geom_line(aes(hour, sum_favoriteCount), color="blue") +
-    labs(x = "Hour of day")
+    labs(x = "Hour of a day")
 
 p3 <- ggplot(tweeting_hour) +
     geom_line(aes(hour, mean_favoriteCount), color="red") +
-    labs(x = "Hour of day")
+    labs(x = "Hour of a day")
 
 p4 <- ggplot(tweeting_hour_20) +
     geom_point(aes(x = word, y = hour)) +
-    labs(y = "Hour of day")
+    labs(y = "Hour of a day")
 
 plot_grid(p1, p2, p3, p4, ncol = 2)
 ```
+
+## Picture/Link from each source
+
+```{r}
+# Whether a Picture/Link is likely to be included in a Tweet
+picture <- df %>% 
+    filter(!str_detect(text, '^"')) %>% 
+    count(source, picture = ifelse(str_detect(text, "t.co"), 
+                                   "Picture/link", "No picture/link"))
+picture
+
+df %>% 
+    filter(!str_detect(text, '^"')) %>% 
+    count(picture = ifelse(str_detect(text, "t.co"), 
+                                   "Picture/link", "No picture/link")) %>% 
+    ggplot() + 
+    geom_bar(aes(picture, n), stat = "identity", width = 0.5) + 
+    labs(x = "", y = "count")
+```
+
+
+Comparison of Words
+====================
 
 
 ## Word Frequency Plot
 
 ```{r message=FALSE, warning=FALSE}
+
 tweet_words %>%
     count(word) %>%
     mutate(word = reorder(word, n)) %>%
@@ -123,6 +160,38 @@ tweet_words %>%
     ylab("frequency of occurrence") +
     coord_flip()
 ```
+
+## Word Weighting of different sources (Video Streaming App and The White House)
+
+```{r message=FALSE, warning=FALSE}
+# Word Weighting of different sources (Video Streaming App and The White House)
+WhiteHouse_periscope_ratios <- tweet_words %>%
+  count(word, source) %>%
+  filter(sum(n) >= 5) %>%
+  spread(source, n, fill = 0) %>%
+  ungroup() %>%
+  mutate_each(funs((. + 1) / sum(. + 1)), -word) %>%
+  mutate(logratio = log2(The_White_House / Periscope)) %>%
+  arrange(desc(logratio))
+
+WhiteHouse_periscope_ratios %>%
+  group_by(logratio > 0) %>%
+  top_n(8, abs(logratio)) %>%
+  ungroup() %>%
+  mutate(word = reorder(word, logratio)) %>%
+  ggplot(aes(word, logratio, fill = logratio < 0)) +
+  geom_bar(stat = "identity", width = 0.5) +
+  coord_fixed(ratio = 1000000) +
+  coord_flip() +
+  ylab("The White House / Periscope log ratio") +
+  scale_fill_manual(name = "", labels = c("The White House", "Periscope"),
+                    values = c("red", "lightblue"))
+```
+
+
+Sentiment Analysis
+====================
+
 
 ## Tweets Sentiment Overview
 
