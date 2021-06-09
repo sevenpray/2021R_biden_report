@@ -76,10 +76,10 @@ tweet_words <- df %>%
 ```{r}
 
 ggplot(data = df) + 
-    geom_col(mapping = aes(x = created, y = retweetCount, color = source))
+    geom_col(mapping = aes(x = created, y = retweetCount, color = source, fill = source))
 
 ggplot(data = df) + 
-    geom_col(mapping = aes(x = created, y = favoriteCount, color = source))
+    geom_col(mapping = aes(x = created, y = favoriteCount, color = source, fill = source))
 ```
 
 ### Tweeting in Hour of a Day
