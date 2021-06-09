@@ -80,6 +80,6 @@ by_source_sentiment <- tweet_words %>%
     inner_join(sources) %>%
     group_by(source, sentiment, total_words) %>%
     summarize(words = sum(n)) %>%
-    arrange(total_words) %>%
+    arrange(desc(total_words)) %>%
     ungroup()
 

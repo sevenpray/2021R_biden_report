@@ -1,0 +1,268 @@
+---
+title: "Sentiment Analysis (Micro)"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Import libraries
+```{r}
+library(dplyr)
+library(tibble)
+library(ggplot2)
+library(stringr)
+library(tidyr)
+library(lubridate)
+library(scales)
+library(tidytext)
+library(textdata)
+```
+
+Load the dataset
+```{r}
+load(file = "biden_tweets_df.rda")
+```
+
+Mutate "source" column and select some columns
+```{r}
+df <- biden_tweets_df %>% 
+    mutate(source = sapply(biden_tweets_df$statusSource , function(x) {
+        if (str_detect(x, pattern = "Twitter Web App")) return("Twitter Web App")
+        else if (str_detect(x, pattern = "Periscope")) return("Periscope")
+        else if (str_detect(x, pattern = "Twitter Media Studio")) return("Twitter Media Studio")
+        else if (str_detect(x, pattern = "Sprinklr")) return("Sprinklr")
+        else return("The White House")
+    })) %>% select(id, source, text, created, retweetCount, favoriteCount)
+```
+
+```{r}
+favorite <- df%>%
+  arrange(desc(favoriteCount)) %>%
+  top_n(50)
+```
+
+Collect tweet words
+```{r}
+reg <- "([^A-Za-z\\d#@']|'(?![A-Za-z\\d#@]))"
+favorite_words <- favorite %>%
+    filter(!str_detect(text, '^"')) %>%
+    mutate(text = str_replace_all(text, "https://t.co/[A-Za-z\\d]+|&amp;", "")) %>%
+    unnest_tokens(word, text, token = "regex", pattern = reg) %>%
+    filter(!word %in% stop_words$word,
+           str_detect(word, "[a-z]")) %>%
+    arrange(desc(favoriteCount))
+```
+
+
+
+
+```{r}
+sentiment_overview <- favorite_words %>%
+    inner_join(get_sentiments("nrc")) %>%
+    filter(!is.na(sentiment)) %>%
+    count(sentiment, sort = TRUE)
+
+sentiment_overview
+
+sentiment_overview %>% 
+  ggplot() + 
+  geom_bar(aes(x = reorder(sentiment, n), y = n), stat = "identity") +
+  coord_flip()
+```
+
+```{r}
+nrc_word_counts <- favorite_words %>%
+  inner_join(get_sentiments("nrc")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  ungroup()
+
+nrc_word_counts
+
+nrc_word_counts %>% 
+  filter(n > 1) %>%
+  ggplot() +
+  geom_histogram(aes(x = reorder(word, n), y = n), stat = "identity", width = 0.75) +
+  coord_flip() +
+  facet_wrap(vars(sentiment), scales = "free") + 
+  theme(axis.text.y = element_text(size = rel(0.75))) + 
+  labs(x = "Word", y = "", title = "Words with Top Fifty FavoriteCount by Sentiment")
+```
+
+Common positive words
+```{r}
+nrc_positive <- get_sentiments("nrc") %>% 
+  filter(sentiment == "positive")
+
+positive_words = favorite_words %>%
+  inner_join(nrc_positive) %>%
+  count(word, sort = TRUE)
+
+positive_words
+
+positive_words %>% 
+  filter(n > 1) %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Positive")
+```
+
+Common trust words
+```{r}
+nrc_trust <- get_sentiments("nrc") %>% 
+  filter(sentiment == "trust")
+
+trust_words = favorite_words %>%
+  inner_join(nrc_trust) %>%
+  count(word, sort = TRUE)
+
+trust_words
+
+trust_words %>% 
+  filter(n > 1) %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Trust")
+```
+
+Common anticipation words
+```{r}
+nrc_anticipation <- get_sentiments("nrc") %>% 
+  filter(sentiment == "anticipation")
+
+anticipation_words = favorite_words %>%
+  inner_join(nrc_anticipation) %>%
+  count(word, sort = TRUE)
+
+anticipation_words
+
+anticipation_words %>% 
+  head() %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Anticipation")
+```
+
+Common negative words
+```{r}
+nrc_negative <- get_sentiments("nrc") %>% 
+  filter(sentiment == "negative")
+
+negative_words = favorite_words %>%
+  inner_join(nrc_negative) %>%
+  count(word, sort = TRUE)
+
+negative_words
+
+negative_words %>% 
+  head() %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Negative")
+```
+
+Common joy words
+```{r}
+nrc_joy <- get_sentiments("nrc") %>% 
+  filter(sentiment == "joy")
+
+joy_words = favorite_words %>%
+  inner_join(nrc_joy) %>%
+  count(word, sort = TRUE)
+
+joy_words
+
+joy_words %>% 
+  head() %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Joy")
+```
+
+Common fear words
+```{r}
+nrc_fear <- get_sentiments("nrc") %>% 
+  filter(sentiment == "fear")
+
+fear_words = favorite_words %>%
+  inner_join(nrc_fear) %>%
+  count(word, sort = TRUE)
+
+fear_words
+
+fear_words %>% 
+  head() %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Fear")
+```
+
+Common sadness words
+```{r}
+nrc_sadness <- get_sentiments("nrc") %>% 
+  filter(sentiment == "sadness")
+
+sadness_words = favorite_words %>%
+  inner_join(nrc_sadness) %>%
+  count(word, sort = TRUE)
+
+sadness_words
+
+sadness_words %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Sadness")
+```
+
+Common anger words
+```{r}
+nrc_anger <- get_sentiments("nrc") %>% 
+  filter(sentiment == "anger")
+
+anger_words = favorite_words %>%
+  inner_join(nrc_anger) %>%
+  count(word, sort = TRUE)
+
+anger_words
+
+anger_words %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Anger")
+```
+
+Common surprise words
+```{r}
+nrc_surprise <- get_sentiments("nrc") %>% 
+  filter(sentiment == "surprise")
+
+surprise_words = favorite_words %>%
+  inner_join(nrc_surprise) %>%
+  count(word, sort = TRUE)
+
+surprise_words
+
+surprise_words %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Surprise")
+```
+
+Common disgust words
+```{r}
+nrc_disgust <- get_sentiments("nrc") %>% 
+  filter(sentiment == "disgust")
+
+disgust_words = favorite_words %>%
+  inner_join(nrc_fear) %>%
+  count(word, sort = TRUE)
+
+disgust_words
+
+disgust_words %>% 
+  head() %>% 
+  ggplot() + 
+  geom_bar(aes(x = n, y = word), stat = "identity") + 
+  labs(x = "Count", y = "", title = "Words of Disgust")
+```
