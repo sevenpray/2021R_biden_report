@@ -3,11 +3,23 @@ title: '推文在一天中哪些特定時間段的轉推數跟喜歡數比較多
 output: html_document
 ---
 
+觀察結果
+
+將發文時間轉換成美東時間後，發文最多的時間為晚上8點，其次依序是下午1點，下午3點，下午2點與6點。除了晚上8點外，其餘多是在下午的時段發文，而凌晨1點到五點這段時間內並無發文。
+
+將每個小時喜歡數加總後，發現其與發文數的排序大致相同，前五依序為晚上8點，下午6點，下午1點，下午3點，下午2點。將每個小時的喜歡數平均後，排序與加總有些不同，依序為晚上10點，晚上9點，晚上8點，晚上6點，中午12點。
+
+依據喜歡數與轉推數的摺線圖可發現它們的分布與轉折大致相同。將每個小時轉推數加總後，前五依序為晚上8點，下午1點，下午6點，下午3點，中午12點。將每個小時的轉推數平均後，依序為晚上10點，早上8點，晚上9點，中午12點，晚上6點，而發文數最多的晚上8點排名第七。
+
+發文數少的時間只要有幾篇特別多人喜歡或轉推，他的平均數就會特別高，可能代表即使不在熱門時段發文，若內文屬重要議題或是其他民眾關注的內容也可獲得相當數量的喜歡與轉推。舉例來說，晚上10點發文18篇，佔2.7%，不及晚上8點64篇，但前三多的喜歡數多達623536、450422、111240，而623536這篇更是全部貼文中喜歡數排名第二的推文，內文為「Grateful for the short commute on days like these. https://t.co/unUej4WhpB」 ，與疫情相關，僅低於晚上8點發布，喜歡數為659343的「We're back in the Paris Climate Agreement.」
+
+而每篇推文喜歡數的差異極大，最多的推文為659343，最少為4139，觀察喜歡數前10%的發文時間涵蓋早上7點至晚上10點，也可能代表重要議題只要在一般作息時間發文都會有很多人響應。
+
 ```{r}
 library(tidyverse)
-library(ggplot2)
 library(lubridate)
 library(scales)
+library(reshape2)
 load("~/biden_tweets_df.rda")
 
 ```
@@ -16,23 +28,35 @@ load("~/biden_tweets_df.rda")
 ```{r}
 #整理表格
 new_biden <- biden_tweets_df %>%
-    mutate(hour = hour(with_tz(created, "EST"))) %>%
+    mutate(hour = hour(with_tz(created, "EST")))%>%
+    select(text, created,hour,favoriteCount,retweetCount)%>%
     group_by(hour) %>%
-    summarise(number=n(), sum_favoriteCount=sum(favoriteCount), mean_favoriteCount=mean(favoriteCount), sum_retweetCount=sum(retweetCount), mean_retweetCount=mean(retweetCount))%>%
-    arrange(desc(number))
+    summarise(n=n(), sum_favoriteCount=sum(favoriteCount), mean_favoriteCount=mean(favoriteCount), sum_retweetCount=sum(retweetCount), mean_retweetCount=mean(retweetCount))%>%
+    arrange(desc(n))
 
 
 #新表格
 new_biden
 
+```
+
+
+```{r}
+
 #發文數量
 new_biden %>%
-    select(hour,number) %>%
-    arrange(desc(number))
+    select(hour,n) %>%
+    mutate(percent = n / sum(n)) %>%
+    arrange(desc(n))
 
 #發文數量長條圖
 ggplot(new_biden)+
-    geom_bar(aes(hour,number), stat = "identity") 
+    geom_bar(aes(hour,n), stat = "identity") 
+
+```
+
+
+```{r}
 
 #喜歡數加總排序
 new_biden %>%
@@ -41,8 +65,12 @@ new_biden %>%
 
 #喜歡數加總長條圖
 ggplot(new_biden)+
-    geom_bar(aes(hour, sum_favoriteCount), stat = "identity", fill="lightblue")
+    geom_bar(aes(hour, sum_favoriteCount), stat = "identity")
 
+```
+
+
+```{r}
 #喜歡數平均數排序
 new_biden %>%
     select(hour,mean_favoriteCount) %>%
@@ -50,8 +78,26 @@ new_biden %>%
 
 #喜歡數平均數長條圖
 ggplot(new_biden)+
-    geom_bar(aes(hour, mean_favoriteCount,fill="blue"), stat = "identity", fill="lightblue")
+    geom_bar(aes(hour, mean_favoriteCount), stat = "identity")
 
+```
+
+```{r}
+#喜歡數前10%的發文時間
+new<- biden_tweets_df %>%
+    mutate(hour = hour(with_tz(created, "EST")))%>%
+    select(text, created,hour,favoriteCount,retweetCount)
+new %>%
+    arrange(desc(favoriteCount)) %>%
+    top_n(66) %>%
+    group_by(hour)%>%
+    summarise(n=n()) %>%
+    arrange(desc(n))
+```
+
+
+
+```{r}
 #轉推數加總數排序
 new_biden %>%
     select(hour,sum_retweetCount) %>%
@@ -61,6 +107,10 @@ new_biden %>%
 ggplot(new_biden)+
     geom_bar(aes(hour,sum_retweetCount), stat = "identity")
 
+```
+
+
+```{r}
 #轉推數平均數排序
 new_biden %>%
     select(hour,mean_retweetCount) %>%
@@ -70,15 +120,25 @@ new_biden %>%
 ggplot(new_biden)+
     geom_bar(aes(hour, mean_retweetCount), stat = "identity") 
 
+```
+
+
+```{r}
 #喜歡數轉推平均折線圖
-ggplot(new_biden)+
-    geom_line(aes(hour, mean_favoriteCount), color="blue")+
-    geom_line(aes(hour, mean_retweetCount))
+mean <-new_biden%>%
+    select(hour,mean_favoriteCount,mean_retweetCount)
+mean_melt <- melt(mean, id.var='hour')
+ggplot(mean_melt , aes(x=hour, y=value, col=variable)) + 
+    geom_line()+
+    labs(x = "hour of day", y = "number")
 
 #喜歡數轉推總和折線圖
-ggplot(new_biden)+
-    geom_line(aes(hour, sum_favoriteCount), color="blue", )+
-    geom_line(aes(hour, sum_retweetCount))
+sum<-new_biden%>%
+    select(hour,sum_favoriteCount,sum_retweetCount)
+sum_melt <- melt(sum, id.var='hour')
+ggplot(sum_melt , aes(x=hour, y=value, col=variable)) + 
+    geom_line()+
+    labs(x = "hour of day", y = "number")
 
 ```
 
