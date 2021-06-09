@@ -1,6 +1,6 @@
 ---
 title: "From JoeBiden to POTUS"
-author: "組員：簡郁展, 潘立恆, 張繼賢, 劉慧新, 陳暘"
+author: "組員：簡郁展, 潘立恆, 邱繼賢, 劉慧新, 陳暘"
 date: "2021/6/8"
 output: 
     html_document:

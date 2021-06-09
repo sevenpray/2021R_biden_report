@@ -2,12 +2,12 @@ library(dplyr)
 library(tibble)
 library(ggplot2)
 library(stringr)
-library(tidyr)
+librsourceary(tidyr)
 library(lubridate)
 library(scales)
 load("C:/Users/USER/Downloads/biden_tweets_df.rda")
 
-# mutate source
+# mutate 
 df = biden_tweets_df %>% 
     mutate(source = sapply(biden_tweets_df$statusSource , function(x) {
         if (str_detect(x, pattern = "Twitter Web App")) return("Twitter Web App")
