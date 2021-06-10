@@ -37,8 +37,8 @@ r1 = as.character(twitext$text)
 r1<-tolower(r1)
 
 #分詞處理
-cutter=worker() #设置分词引擎
-segWords <- segment(r1,cutter)  #对文本进行分词处理
+cutter=worker() #設置分詞引擎
+segWords <- segment(r1,cutter)  #對文本分詞處理
 #詞頻清洗以及篩選計算   
 f <- readLines("stopword.txt")
 stopwords <- c(NULL)
