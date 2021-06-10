@@ -61,4 +61,5 @@ topwords_30<-top_n(topwords,30,freq)
 topwords_30
 #繪製圖表
 ggplot(data = topwords_30) + 
-  geom_col(mapping = aes(x = words, y = freq))
+  geom_col(mapping = aes(x = words, y = freq))+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5))
