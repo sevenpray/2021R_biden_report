@@ -117,9 +117,8 @@ p3 <- ggplot(tweeting_hour) +
     labs(x = "Hour of a day")
 
 p4 <- ggplot(tweeting_hour_20) +
-    geom_point(aes(x = word, y = hour)) +
-    labs(y = "Hour of a day") + 
-    theme(axis.text.x = element_text(angle = 90))
+    geom_point(aes(x = hour, y = word)) +
+    labs(x = "Hour of a day")
 
 plot_grid(p1, p2, p3, p4, ncol = 2)
 ```
