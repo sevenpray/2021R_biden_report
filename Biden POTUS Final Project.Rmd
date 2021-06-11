@@ -42,6 +42,7 @@ library(cowplot)
 
 #Load the dataset obtained from TwitteR package
 load(file = "biden_tweets_df.rda")
+load(file = "AllJoeBidenTweets.rda")
 
 # Mutate source column and select other meaningful columns
 df <- biden_tweets_df %>% 
@@ -305,5 +306,36 @@ nrc_word_counts %>%
   facet_wrap(vars(sentiment), scales = "free") + 
   theme(axis.text.y = element_text(size = rel(0.75))) + 
   labs(x = "Word", y = "", title = "Words with Top Fifty FavoriteCount by Sentiment")
+```
+
+## Compared with @JoeBiden
+
+```{r message=FALSE, warning=FALSE}
+reg <- "([^A-Za-z\\d#@']|'(?![A-Za-z\\d#@]))"
+tweet_words2 <- AllJoeBidenTweets %>%
+    filter(!str_detect(tweet, '^"')) %>%
+    mutate(text = str_replace_all(tweet, "https://t.co/[A-Za-z\\d]+|&amp;", "")) %>%
+    unnest_tokens(word, text, token = "regex", pattern = reg) %>%
+    filter(!word %in% stop_words$word,
+           str_detect(word, "[a-z]")) %>%
+    arrange(desc(likes))
+    
+
+sentiment_counts <- tweet_words2 %>%
+  left_join(get_sentiments("nrc")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  ungroup()
+
+sentiment_counts %>% 
+  group_by(sentiment) %>% 
+  top_n(8, n) %>% 
+  arrange(desc(n)) %>% 
+  ungroup() %>%
+  ggplot() +
+  geom_histogram(aes(x = reorder(word, n), y = n), stat = "identity", width = 0.75) +
+  coord_flip() +
+  facet_wrap(vars(sentiment), scales = "free") + 
+  theme(axis.text.y = element_text(size = rel(0.75))) + 
+  labs(x = "Word", y = "", title = "Frequency of Occurrence by Sentiment")
 ```
 
