@@ -334,8 +334,20 @@ sentiment_counts <- tweet_words2 %>%
   count(word, sentiment, sort = TRUE) %>%
   ungroup()
 
+sentiment_df = sentiment_counts %>% 
+  group_by(sentiment) %>% 
+  summarise(n = n()) %>% 
+  arrange(desc(n)) %>% 
+  ungroup()
+
+sentiment_df %>% 
+  filter(!is.na(sentiment)) %>%
+  ggplot() + 
+  geom_bar(aes(x = n, y = reorder(sentiment, n)), stat = "identity") + 
+  labs(x = "count", y = "sentiment")
+
 sentiment_counts$sentiment = 
-  factor(sentiment_counts$sentiment, levels = sentiment_overview$sentiment)
+  factor(sentiment_counts$sentiment, levels = sentiment_df$sentiment)
 
 sentiment_counts %>% 
   group_by(sentiment) %>% 
