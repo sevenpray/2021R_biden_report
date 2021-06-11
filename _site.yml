@@ -1,7 +1,7 @@
 name: "2021R_biden_report"
 output_dir: "."
 navbar:
-  title: "RLADS 2021"
+  title: "Text Analysis of Biden’s @POTUS Tweets"
       
   right:
     - icon: fab fa-github fa-lg
