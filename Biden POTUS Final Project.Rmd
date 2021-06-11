@@ -18,9 +18,9 @@ knitr::opts_chunk$set(echo = TRUE)
 Problematic
 ====================
 
-1. 拜登正式就任美國第46任總統後，Twitter也將總統官方帳號POTUS轉交拜登團隊。與四年前交接不同的是，拜登並未接收先前川普的POTUS粉絲基礎，追蹤者將從零開始。多數美國媒體聲稱過去拜登的個人推特經營主要面向美國大眾推廣政策理念，相反的川普帳號只跟自己的支持者對話。如今，拜登的個人推特帳號主要扮演轉推POTUS推文的角色，而時下未見有拜登POTUS的詳細分析。拜登POTUS在公共關係經營上真的還是走傳統、建制路線嗎？本專案想要探討拜登POTUS是僅僅將twitter當作另一個宣傳政令跟政府講話的媒體平台，還是存在更簡結有力的政策想法以及情緒宣傳？
 
-2. 本專案預設tokenize去掉停詞之後取得的關鍵字對於推文含意的辨識度還是有權重差異的，有些特別具象化單詞會被推論為具有特定政策意涵或與特定政策事件相關。而其他較模糊的政治相關用語或一般字詞則被視為不具有明確政策資訊內涵。因此，本專案簡單假設如果POTUS只是一個單純宣傳政令或講話的帳號，應該大量含有上述辨識度高的具象化單字以指涉特定議題或事件。或者，在喜歡數或轉推數較高的推文中，要可以觀察到上述情形。
+拜登正式就任美國第46任總統後，Twitter也將總統官方帳號POTUS轉交拜登團隊。與四年前交接不同的是，拜登並未接收先前川普的POTUS粉絲基礎，追蹤者將從零開始。多數美國媒體聲稱過去拜登的個人推特經營主要面向美國大眾推廣政策理念，相反的川普帳號只跟自己的支持者對話。如今，拜登的個人推特帳號主要扮演轉推POTUS推文的角色，而時下未見有拜登POTUS的詳細分析。拜登POTUS在公共關係經營上真的還是走傳統、建制路線嗎？本專案想要探討拜登POTUS是僅僅將twitter當作另一個宣傳政令跟政府講話的媒體平台，還是存在更簡結有力的政策想法以及情緒宣傳？
+
 
 General Analysis
 ====================
@@ -39,9 +39,10 @@ library(scales)
 library(tidytext)
 library(textdata)
 library(cowplot)
+
 #Load the dataset obtained from TwitteR package
 load(file = "biden_tweets_df.rda")
-load(file = "AllJoeBidenTweets.rda")
+
 # Mutate source column and select other meaningful columns
 df <- biden_tweets_df %>% 
     mutate(source = sapply(biden_tweets_df$statusSource , function(x) {
@@ -73,8 +74,10 @@ tweet_words <- df %>%
 ### Time line of retweetCount and FavoriteCount from Feb to May
 
 ```{r}
+
 ggplot(data = df) + 
     geom_col(mapping = aes(x = created, y = retweetCount, color = source, fill = source))
+
 ggplot(data = df) + 
     geom_col(mapping = aes(x = created, y = favoriteCount, color = source, fill = source))
 ```
@@ -90,11 +93,13 @@ tweeting_hour <- df %>%
               mean_favoriteCount = mean(favoriteCount), 
               mean_retweetCount = mean(retweetCount)) %>%
     arrange(desc(number))
+
 tweeting_hour_20 <- tweet_words %>%
     select(hour, word, retweetCount, favoriteCount) %>%
     inner_join(get_sentiments("nrc")) %>%
     arrange(desc(favoriteCount)) %>%
     top_n(20, favoriteCount)
+
 p1 <- df %>% 
     count(hour = hour(with_tz(created, "EST"))) %>% 
     mutate(percent = n / sum(n)) %>%
@@ -102,15 +107,20 @@ p1 <- df %>%
     geom_line() + 
     scale_y_continuous(labels = percent_format()) + 
     labs(x = "Hour of a day", y = "% of tweets")
+
 p2 <- ggplot(tweeting_hour) + 
     geom_line(aes(hour, sum_favoriteCount), color="blue") +
     labs(x = "Hour of a day")
+
 p3 <- ggplot(tweeting_hour) +
     geom_line(aes(hour, mean_favoriteCount), color="red") +
     labs(x = "Hour of a day")
+
 p4 <- ggplot(tweeting_hour_20) +
-    geom_point(aes(x = hour, y = word)) +
-    labs(x = "Hour of a day")
+    geom_point(aes(x = word, y = hour)) +
+    labs(y = "Hour of a day") + 
+    theme(axis.text.x = element_text(angle = 90))
+
 plot_grid(p1, p2, p3, p4, ncol = 2)
 ```
 
@@ -123,6 +133,7 @@ picture <- df %>%
     count(source, picture = ifelse(str_detect(text, "t.co"), 
                                    "Picture/link", "No picture/link"))
 picture
+
 df %>% 
     filter(!str_detect(text, '^"')) %>% 
     count(picture = ifelse(str_detect(text, "t.co"), 
@@ -140,6 +151,7 @@ Comparison of Words
 ## Word Frequency Plot
 
 ```{r message=FALSE, warning=FALSE}
+
 tweet_words %>%
     count(word) %>%
     mutate(word = reorder(word, n)) %>%
@@ -162,6 +174,7 @@ WhiteHouse_periscope_ratios <- tweet_words %>%
   mutate_each(funs((. + 1) / sum(. + 1)), -word) %>%
   mutate(logratio = log2(The_White_House / Periscope)) %>%
   arrange(desc(logratio))
+
 WhiteHouse_periscope_ratios %>%
   group_by(logratio > 0) %>%
   top_n(8, abs(logratio)) %>%
@@ -188,7 +201,9 @@ sentiment_overview <- tweet_words %>%
     inner_join(get_sentiments("nrc")) %>%
     filter(!is.na(sentiment)) %>%
     count(sentiment, sort = TRUE)
+
 sentiment_overview
+
 ggplot(sentiment_overview) + 
   geom_bar(aes(x = reorder(sentiment, n), y = n), stat = "identity") +
   coord_flip()
@@ -202,6 +217,7 @@ sources <- tweet_words %>%
     mutate(total_words = n()) %>%
     ungroup() %>%
     distinct(id, source, total_words)
+
 by_source_sentiment <- tweet_words %>%
     inner_join(get_sentiments("nrc"), by = "word") %>%
     count(sentiment, id) %>%
@@ -212,7 +228,9 @@ by_source_sentiment <- tweet_words %>%
     summarize(words = sum(n)) %>%
     arrange(desc(total_words)) %>%
     ungroup()
+
 by_source_sentiment
+
 ```
 
 ## Usage of Common Sentimental Words
@@ -247,6 +265,7 @@ nrc_word_counts %>%
 favorite <- df%>%
   arrange(desc(favoriteCount)) %>%
   top_n(50)
+
 # Collecting Tweets Words
 reg <- "([^A-Za-z\\d#@']|'(?![A-Za-z\\d#@]))"
 favorite_words <- favorite %>%
@@ -256,12 +275,15 @@ favorite_words <- favorite %>%
     filter(!word %in% stop_words$word,
            str_detect(word, "[a-z]")) %>%
     arrange(desc(favoriteCount))
+
 # View the difference between whole POTUS tweets and top 50 favorite tweets 
 sentiment_overview_50 <- favorite_words %>%
     inner_join(get_sentiments("nrc")) %>%
     filter(!is.na(sentiment)) %>%
     count(sentiment, sort = TRUE)
+
 sentiment_overview_50
+
 sentiment_overview_50 %>% 
   ggplot() + 
   geom_bar(aes(x = reorder(sentiment, n), y = n), stat = "identity") +
@@ -273,7 +295,9 @@ nrc_word_counts <- favorite_words %>%
   inner_join(get_sentiments("nrc")) %>%
   count(word, sentiment, sort = TRUE) %>%
   ungroup()
+
 nrc_word_counts
+
 nrc_word_counts %>% 
   filter(n > 1) %>%
   ggplot() +
@@ -284,31 +308,3 @@ nrc_word_counts %>%
   labs(x = "Word", y = "", title = "Words with Top Fifty FavoriteCount by Sentiment")
 ```
 
-## Compared with @JoeBiden
-
-```{r message=FALSE, warning=FALSE}
-reg <- "([^A-Za-z\\d#@']|'(?![A-Za-z\\d#@]))"
-tweet_words2 <- JoeBidenTweets %>%
-    filter(!str_detect(tweet, '^"')) %>%
-    mutate(text = str_replace_all(tweet, "https://t.co/[A-Za-z\\d]+|&amp;", "")) %>%
-    unnest_tokens(word, text, token = "regex", pattern = reg) %>%
-    filter(!word %in% stop_words$word,
-           str_detect(word, "[a-z]")) %>%
-    arrange(desc(likes))
-    
-sentiment_counts <- tweet_words2 %>%
-  left_join(get_sentiments("nrc")) %>%
-  count(word, sentiment, sort = TRUE) %>%
-  ungroup()
-sentiment_counts %>% 
-  group_by(sentiment) %>% 
-  top_n(8, n) %>% 
-  arrange(desc(n)) %>% 
-  ungroup() %>%
-  ggplot() +
-  geom_histogram(aes(x = reorder(word, n), y = n), stat = "identity", width = 0.75) +
-  coord_flip() +
-  facet_wrap(vars(sentiment), scales = "free") + 
-  theme(axis.text.y = element_text(size = rel(0.75))) + 
-  labs(x = "Word", y = "", title = "Frequency of Occurrence by Sentiment")
-```
