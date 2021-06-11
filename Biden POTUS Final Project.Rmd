@@ -208,6 +208,7 @@ sentiment_overview
 
 ggplot(sentiment_overview) + 
   geom_bar(aes(x = reorder(sentiment, n), y = n), stat = "identity") +
+  labs(x = "sentiment", y = "count") + 
   coord_flip()
 ```
 
@@ -243,6 +244,8 @@ nrc_word_counts <- tweet_words %>%
   count(word, sentiment, sort = TRUE) %>%
   ungroup()
   
+nrc_word_counts$sentiment = 
+  factor(nrc_word_counts$sentiment, levels = sentiment_overview$sentiment)
 nrc_word_counts
 ```
 
@@ -255,7 +258,7 @@ nrc_word_counts %>%
   ggplot() +
   geom_histogram(aes(x = reorder(word, n), y = n), stat = "identity", width = 0.75) +
   coord_flip() +
-  facet_wrap(vars(sentiment), scales = "free") + 
+  facet_wrap(~sentiment, scales = "free") + 
   theme(axis.text.y = element_text(size = rel(0.75))) + 
   labs(x = "Word", y = "", title = "Frequency of Occurrence by Sentiment")
 ```
@@ -289,6 +292,7 @@ sentiment_overview_50
 sentiment_overview_50 %>% 
   ggplot() + 
   geom_bar(aes(x = reorder(sentiment, n), y = n), stat = "identity") +
+  labs(x = "sentiment", y = "count") + 
   coord_flip()
 ```
 
@@ -297,6 +301,9 @@ nrc_word_counts <- favorite_words %>%
   inner_join(get_sentiments("nrc")) %>%
   count(word, sentiment, sort = TRUE) %>%
   ungroup()
+
+nrc_word_counts$sentiment = 
+  factor(nrc_word_counts$sentiment, levels = sentiment_overview_50$sentiment)
 
 nrc_word_counts
 
@@ -326,6 +333,9 @@ sentiment_counts <- tweet_words2 %>%
   left_join(get_sentiments("nrc")) %>%
   count(word, sentiment, sort = TRUE) %>%
   ungroup()
+
+sentiment_counts$sentiment = 
+  factor(sentiment_counts$sentiment, levels = sentiment_overview$sentiment)
 
 sentiment_counts %>% 
   group_by(sentiment) %>% 
