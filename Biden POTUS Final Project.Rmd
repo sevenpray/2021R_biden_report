@@ -18,8 +18,9 @@ knitr::opts_chunk$set(echo = TRUE)
 Problematic
 ====================
 
+1. 拜登正式就任美國第46任總統後，Twitter也將總統官方帳號POTUS轉交拜登團隊。與四年前交接不同的是，拜登並未接收先前川普的POTUS粉絲基礎，追蹤者將從零開始。多數美國媒體聲稱過去拜登的個人推特經營主要面向美國大眾推廣政策理念，相反的川普帳號只跟自己的支持者對話。如今，拜登的個人推特帳號主要扮演轉推POTUS推文的角色，而時下未見有拜登POTUS的詳細分析。拜登POTUS在公共關係經營上真的還是走傳統、建制路線嗎？本專案想要探討拜登POTUS是僅僅將twitter當作另一個宣傳政令跟政府講話的媒體平台，還是存在更簡結有力的政策想法以及情緒宣傳？
 
-拜登正式就任美國第46任總統後，Twitter也將總統官方帳號POTUS轉交拜登團隊。與四年前交接不同的是，拜登並未接收先前川普的POTUS粉絲基礎，追蹤者將從零開始。多數美國媒體聲稱過去拜登的個人推特經營主要面向美國大眾推廣政策理念，相反的川普帳號只跟自己的支持者對話。如今，拜登的個人推特帳號主要扮演轉推POTUS推文的角色，而時下未見有拜登POTUS的詳細分析。拜登POTUS在公共關係經營上真的還是走傳統、建制路線嗎？本專案想要探討拜登POTUS是僅僅將twitter當作另一個宣傳政令跟政府講話的媒體平台，還是存在更簡結有力的政策想法以及情緒宣傳？
+2. 本專案預設tokenize去掉停詞之後取得的關鍵字對於推文含意的辨識度還是有權重差異的，有些特別具象化單詞會被推論為具有特定政策意涵或與特定政策事件相關。而其他較模糊的政治相關用語或一般字詞則被視為不具有明確政策資訊內涵。因此，本專案簡單假設如果POTUS只是一個單純宣傳政令或講話的帳號，應該大量含有上述辨識度高的具象化單字以指涉特定議題或事件。或者，在喜歡數或轉推數較高的推文中，要可以觀察到上述情形。
 
 
 General Analysis
@@ -42,6 +43,7 @@ library(cowplot)
 
 #Load the dataset obtained from TwitteR package
 load(file = "biden_tweets_df.rda")
+load(file = "AllJoeBidenTweets.rda")
 
 # Mutate source column and select other meaningful columns
 df <- biden_tweets_df %>% 
@@ -206,6 +208,7 @@ sentiment_overview
 
 ggplot(sentiment_overview) + 
   geom_bar(aes(x = reorder(sentiment, n), y = n), stat = "identity") +
+  labs(x = "sentiment", y = "count") + 
   coord_flip()
 ```
 
@@ -241,6 +244,8 @@ nrc_word_counts <- tweet_words %>%
   count(word, sentiment, sort = TRUE) %>%
   ungroup()
   
+nrc_word_counts$sentiment = 
+  factor(nrc_word_counts$sentiment, levels = sentiment_overview$sentiment)
 nrc_word_counts
 ```
 
@@ -253,7 +258,7 @@ nrc_word_counts %>%
   ggplot() +
   geom_histogram(aes(x = reorder(word, n), y = n), stat = "identity", width = 0.75) +
   coord_flip() +
-  facet_wrap(vars(sentiment), scales = "free") + 
+  facet_wrap(~sentiment, scales = "free") + 
   theme(axis.text.y = element_text(size = rel(0.75))) + 
   labs(x = "Word", y = "", title = "Frequency of Occurrence by Sentiment")
 ```
@@ -287,6 +292,7 @@ sentiment_overview_50
 sentiment_overview_50 %>% 
   ggplot() + 
   geom_bar(aes(x = reorder(sentiment, n), y = n), stat = "identity") +
+  labs(x = "sentiment", y = "count") + 
   coord_flip()
 ```
 
@@ -295,6 +301,9 @@ nrc_word_counts <- favorite_words %>%
   inner_join(get_sentiments("nrc")) %>%
   count(word, sentiment, sort = TRUE) %>%
   ungroup()
+
+nrc_word_counts$sentiment = 
+  factor(nrc_word_counts$sentiment, levels = sentiment_overview_50$sentiment)
 
 nrc_word_counts
 
@@ -308,3 +317,47 @@ nrc_word_counts %>%
   labs(x = "Word", y = "", title = "Words with Top Fifty FavoriteCount by Sentiment")
 ```
 
+## Compared with @JoeBiden
+```{r message=FALSE, warning=FALSE}
+reg <- "([^A-Za-z\\d#@']|'(?![A-Za-z\\d#@]))"
+tweet_words2 <- AllJoeBidenTweets %>%
+    filter(!str_detect(tweet, '^"')) %>%
+    mutate(text = str_replace_all(tweet, "https://t.co/[A-Za-z\\d]+|&amp;", "")) %>%
+    unnest_tokens(word, text, token = "regex", pattern = reg) %>%
+    filter(!word %in% stop_words$word,
+           str_detect(word, "[a-z]")) %>%
+    arrange(desc(likes))
+    
+
+sentiment_counts <- tweet_words2 %>%
+  left_join(get_sentiments("nrc")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  ungroup()
+
+sentiment_df = sentiment_counts %>% 
+  group_by(sentiment) %>% 
+  summarise(n = n()) %>% 
+  arrange(desc(n)) %>% 
+  ungroup()
+
+sentiment_df %>% 
+  filter(!is.na(sentiment)) %>%
+  ggplot() + 
+  geom_bar(aes(x = n, y = reorder(sentiment, n)), stat = "identity") + 
+  labs(x = "count", y = "sentiment")
+
+sentiment_counts$sentiment = 
+  factor(sentiment_counts$sentiment, levels = sentiment_df$sentiment)
+
+sentiment_counts %>% 
+  group_by(sentiment) %>% 
+  top_n(8, n) %>% 
+  arrange(desc(n)) %>% 
+  ungroup() %>%
+  ggplot() +
+  geom_histogram(aes(x = reorder(word, n), y = n), stat = "identity", width = 0.75) +
+  coord_flip() +
+  facet_wrap(vars(sentiment), scales = "free") + 
+  theme(axis.text.y = element_text(size = rel(0.75))) + 
+  labs(x = "Word", y = "", title = "Frequency of Occurrence by Sentiment")
+```
