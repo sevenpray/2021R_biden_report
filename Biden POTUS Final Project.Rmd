@@ -31,7 +31,7 @@ General Analysis
 
 ## Preprocessing
 
-首先，從`Twitter API`與`twitteR()`獲得的推文擷取資料載入，資料包含拜登@POTUS帳號截止至2021年6月13日共760筆的資料。再來剔除不必要的欄位，並進行發推來源的提取與時區調整。
+首先，從`Twitter API`與`twitteR()`獲得的推文擷取資料載入，資料包含拜登`@POTUS`帳號截止至2021年6月13日共760筆的資料。再來剔除不必要的欄位，並進行發推來源的提取與時區調整。
 
 ```{r message=FALSE, warning=FALSE}
 library(dplyr)
