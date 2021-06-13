@@ -278,7 +278,7 @@ nrc_word_counts %>%
 
 ## Usage of Common Sentimental Words with Top Fifty FavoriteCount
 
-```{r, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE, echo=TRUE}
 # Preprocessing
 favorite <- df %>%
   arrange(desc(favoriteCount)) %>%
