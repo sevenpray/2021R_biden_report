@@ -1,5 +1,5 @@
 ---
-title: "From JoeBiden to POTUS"
+title: "From @JoeBiden to @POTUS"
 author: "組員：簡郁展, 潘立恆, 邱繼賢, 劉慧新, 陳暘"
 date: "2021/6/8"
 output: 
@@ -18,9 +18,11 @@ knitr::opts_chunk$set(echo = TRUE)
 Problematic
 ====================
 
-1. 拜登正式就任美國第46任總統後，Twitter也將總統官方帳號POTUS轉交拜登團隊。與四年前交接不同的是，拜登並未接收先前川普的POTUS粉絲基礎，追蹤者將從零開始。多數美國媒體聲稱過去拜登的個人推特經營主要面向美國大眾推廣政策理念，相反的川普帳號只跟自己的支持者對話。如今，拜登的個人推特帳號主要扮演轉推POTUS推文的角色，而時下未見有拜登POTUS的詳細分析。拜登POTUS在公共關係經營上真的還是走傳統、建制路線嗎？本專案想要探討拜登POTUS是僅僅將twitter當作另一個宣傳政令跟政府講話的媒體平台，還是存在更簡結有力的政策想法以及情緒宣傳？
+1. 拜登正式就任美國第46任總統後，Twitter也將總統官方帳號POTUS轉交拜登團隊。多數美國媒體聲稱過去`@JoeBiden`的經營主要面向美國大眾推廣政策理念，相反的川普帳號只跟自己的支持者對話。而時下未見有拜登`@POTUS`的詳細分析，我們有興趣的是拜登`@POTUS`在公共關係經營上還是走傳統、規律路線嗎？拜登`@POTUS`是僅僅將twitter當作一個宣傳政令跟政府講話的媒體平台，還是存在明顯的情緒宣傳？
 
-2. 本專案預設tokenize去掉停詞之後取得的關鍵字對於推文含意的辨識度還是有權重差異的，有些特別具象化單詞會被推論為具有特定政策意涵或與特定政策事件相關。而其他較模糊的政治相關用語或一般字詞則被視為不具有明確政策資訊內涵。因此，本專案簡單假設如果POTUS只是一個單純宣傳政令或講話的帳號，應該大量含有上述辨識度高的具象化單字以指涉特定議題或事件。或者，在喜歡數或轉推數較高的推文中，要可以觀察到上述情形。
+2. 本專案預設即使去掉停詞之後，取得的關鍵字對於推文含意的辨識度還是有權重差異的。有些特別具象化單詞會能夠指涉與特定政策意涵或與特定政策事件相關，例如`vaccine/covid/jobs/economy/plan`等等。而其他較模糊的政治相關用語(例如`president/senate/congress`等)、一般單詞則被視為不具有明確政策資訊內涵。
+
+3. 因此，本專案簡單假設如果`@POTUS`只是單純宣傳政令或講話的帳號，應該大量含有上述辨識度高的具象化單字以指涉特定議題或事件。或者，在喜歡數或轉推數較高的推文中，要可以觀察到上述情形。同時，本文也會比較`@JoeBiden`在情緒分析是否與`@POTUS`有明顯不同。
 
 
 General Analysis
@@ -28,6 +30,8 @@ General Analysis
 
 
 ## Preprocessing
+
+首先，從`Twitter API`與`twitteR()`獲得的推文擷取資料載入，資料包含拜登`@POTUS`帳號截止至2021年6月13日共760筆的資料。再來剔除不必要的欄位，並進行發推來源的提取與時區調整。
 
 ```{r message=FALSE, warning=FALSE}
 library(dplyr)
@@ -40,11 +44,9 @@ library(scales)
 library(tidytext)
 library(textdata)
 library(cowplot)
-
 #Load the dataset obtained from TwitteR package
 load(file = "biden_tweets_df.rda")
 load(file = "AllJoeBidenTweets.rda")
-
 # Mutate source column and select other meaningful columns
 df <- biden_tweets_df %>% 
     mutate(source = sapply(biden_tweets_df$statusSource , function(x) {
@@ -60,6 +62,8 @@ df <- biden_tweets_df %>%
 
 ## Collect tweet words
 
+使用`unnest_tokens()`從推文內容中提取出單詞並去掉停詞。
+
 ```{r message=FALSE, warning=FALSE}
 reg <- "([^A-Za-z\\d#@']|'(?![A-Za-z\\d#@]))"
 tweet_words <- df %>%
@@ -73,18 +77,41 @@ tweet_words <- df %>%
 
 ## Time line
 
-### Time line of retweetCount and FavoriteCount from Feb to May
+對`@POTUS`從2月到六月的發文狀況做總覽，觀察不同發文來源在`favoriteCount 以及 retweetCount`的表現。
+
+=======
+
+### Time line of retweetCount and FavoriteCount from Feb to June
+
+下面兩張圖可以明顯看出大部分推文都是從`The White House` 發出來的，而`favoriteCount`的數量級大致上為`retweetCount`的十倍，兩者趨勢大體上相同。
+
+- `Twitter Web App`總共只發了四篇貼文，但其中的兩篇皆獲得了幾乎最高的`retweetCount 和 favoriteCount`。
+- `Sprinklr`也只有5篇貼文，但`favoriteCount/retweetCount`前10名的推文中，就有3篇來自`Sprinklr`。
+- 但這些現象都只發生在一月拜登剛就職總統的時候。
+
+### Time line of retweetCount and FavoriteCount from Feb to June
+
+下面兩張圖可以明顯看出大部分推文都是從`The White House` 發出來的，而`favoriteCount`的數量級大致上為`retweetCount`的十倍，兩者趨勢大體上相同。
+
+- `Twitter Web App`總共只發了四篇貼文，但其中的兩篇皆獲得了幾乎最高的`retweetCount 和 favoriteCount`。
+- `Sprinklr`也只有5篇貼文，但`favoriteCount/retweetCount`前10名的推文中，就有3篇來自`Sprinklr`。
+- 但這些現象都只發生在一月拜登剛就職總統的時候。
 
 ```{r}
-
 ggplot(data = df) + 
     geom_col(mapping = aes(x = created, y = retweetCount, color = source, fill = source))
-
 ggplot(data = df) + 
     geom_col(mapping = aes(x = created, y = favoriteCount, color = source, fill = source))
 ```
 
 ### Tweeting in Hour of a Day
+
+將發文時間轉換成美東時間後，可以觀察到以下現象：
+
+- `@POTUS`發文在下午較頻繁，並在下午1點、晚上8點左右達到高峰，而且凌晨1-5點的時間段發文比例相當低，發文時間相當規律。
+- 將每個時間段累積喜歡數加總後，發現與發文比例的趨勢相似，但發文數量多也可能造成喜歡數加總較多的現象。
+- 若檢視每個時間段的喜歡數平均，在下午12-1點、下午5-6點、晚上8-10點都有明顯上升的趨勢，但與前兩張圖不同的是最高峰並非發生在晚上8點。除了晚上8點後發文比例比較少外，晚上8點後轉推數明顯較高也可能是提高觸及率與喜歡數的主要原  因。此外，若內文包含重要議題或是受關注的社會事件，也可能獲得可觀的喜歡與轉推。
+
 
 ```{r message=FALSE, warning=FALSE}
 tweeting_hour <- df %>% 
@@ -95,13 +122,7 @@ tweeting_hour <- df %>%
               mean_favoriteCount = mean(favoriteCount), 
               mean_retweetCount = mean(retweetCount)) %>%
     arrange(desc(number))
-
-tweeting_hour_20 <- tweet_words %>%
-    select(hour, word, retweetCount, favoriteCount) %>%
-    inner_join(get_sentiments("nrc")) %>%
-    arrange(desc(favoriteCount)) %>%
-    top_n(20, favoriteCount)
-
+    
 p1 <- df %>% 
     count(hour = hour(with_tz(created, "EST"))) %>% 
     mutate(percent = n / sum(n)) %>%
@@ -109,24 +130,23 @@ p1 <- df %>%
     geom_line() + 
     scale_y_continuous(labels = percent_format()) + 
     labs(x = "Hour of a day", y = "% of tweets")
-
 p2 <- ggplot(tweeting_hour) + 
-    geom_line(aes(hour, sum_favoriteCount), color="blue") +
+    geom_line(aes(hour, sum_favoriteCount), color = "blue") +
     labs(x = "Hour of a day")
-
 p3 <- ggplot(tweeting_hour) +
-    geom_line(aes(hour, mean_favoriteCount), color="red") +
+    geom_line(aes(hour, mean_favoriteCount), color = "red") +
     labs(x = "Hour of a day")
 
-p4 <- ggplot(tweeting_hour_20) +
-    geom_point(aes(x = hour, y = sentiment)) +
+p4 <- ggplot(tweeting_hour) +
+    geom_line(aes(hour, mean_retweetCount), color = "darkgreen") +
     labs(x = "Hour of a day")
     
-
 plot_grid(p1, p2, p3, p4, ncol = 2)
 ```
 
 ## Picture/Link from each source
+
+`@POTUS`的推文幾乎都附有照片或連結，差距非常顯著。藉由直接觀察拜登的推文，以及推文附帶的文字敘述進而推論這些圖片或連結多與特定會議、政策或社會事件有關。(詳參`Comparison of Words`)
 
 ```{r}
 # Whether a Picture/Link is likely to be included in a Tweet
@@ -135,7 +155,6 @@ picture <- df %>%
     count(source, picture = ifelse(str_detect(text, "t.co"), 
                                    "Picture/link", "No picture/link"))
 picture
-
 df %>% 
     filter(!str_detect(text, '^"')) %>% 
     count(picture = ifelse(str_detect(text, "t.co"), 
@@ -150,10 +169,15 @@ Comparison of Words
 ====================
 
 
+在文字分析的環節，我們希望可以知道:
+- `@POTUS`最常提到的詞彙，以及這些詞彙是否是`Problematic的假設`中在政策意涵上具有辨識度的字詞。
+- 區分這些詞彙的來源傾向。
+
 ## Word Frequency Plot
 
-```{r message=FALSE, warning=FALSE}
+首先是詞頻圖，可以發現`@POTUS`整體而言政策辨識度高的詞彙包含: `plan/jobs/covid/tune/rescue/vaccinated`。推測與拜登的紓困法案《The American Jobs Plan》、《The American Rescue Plan Act of 2021》以及疫苗施打有關。
 
+```{r message=FALSE, warning=FALSE}
 tweet_words %>%
     count(word) %>%
     mutate(word = reorder(word, n)) %>%
@@ -166,6 +190,8 @@ tweet_words %>%
 
 ## Word Weighting of different sources (Video Streaming App and The White House)
 
+接著我們希望了解`@POTUS`在，尤其是使用影音串流平台(`Periscope`)以及一般發文管道`The White House`在文字使用傾向上區別。因此，可以透過計算勝算比(odds ratio)來知道相對於影音平台，`The White House`更傾向提及那些文字內容，反之亦然。
+
 ```{r message=FALSE, warning=FALSE}
 # Word Weighting of different sources (Video Streaming App and The White House)
 WhiteHouse_periscope_ratios <- tweet_words %>%
@@ -176,10 +202,9 @@ WhiteHouse_periscope_ratios <- tweet_words %>%
   mutate_each(funs((. + 1) / sum(. + 1)), -word) %>%
   mutate(logratio = log2(The_White_House / Periscope)) %>%
   arrange(desc(logratio))
-
 WhiteHouse_periscope_ratios %>%
   group_by(logratio > 0) %>%
-  top_n(5, abs(logratio)) %>%
+  top_n(8, abs(logratio)) %>%
   ungroup() %>%
   mutate(word = reorder(word, logratio)) %>%
   ggplot(aes(word, logratio, fill = logratio < 0)) +
@@ -190,6 +215,8 @@ WhiteHouse_periscope_ratios %>%
   scale_fill_manual(name = "", labels = c("The White House", "Periscope"),
                     values = c("red", "lightblue"))
 ```
+
+可以發現從影音平台發布的推文更常標註其他 twitter 帳號，包含
 
 
 Sentiment Analysis
@@ -203,9 +230,7 @@ sentiment_overview <- tweet_words %>%
     inner_join(get_sentiments("nrc")) %>%
     filter(!is.na(sentiment)) %>%
     count(sentiment, sort = TRUE)
-
 sentiment_overview
-
 ggplot(sentiment_overview) + 
   geom_bar(aes(x = reorder(sentiment, n), y = n), stat = "identity") +
   labs(x = "sentiment", y = "count") + 
@@ -220,7 +245,6 @@ sources <- tweet_words %>%
     mutate(total_words = n()) %>%
     ungroup() %>%
     distinct(id, source, total_words)
-
 by_source_sentiment <- tweet_words %>%
     inner_join(get_sentiments("nrc"), by = "word") %>%
     count(sentiment, id) %>%
@@ -231,9 +255,7 @@ by_source_sentiment <- tweet_words %>%
     summarize(words = sum(n)) %>%
     arrange(desc(total_words)) %>%
     ungroup()
-
 by_source_sentiment
-
 ```
 
 ## Usage of Common Sentimental Words
@@ -246,10 +268,7 @@ nrc_word_counts <- tweet_words %>%
   
 nrc_word_counts$sentiment = 
   factor(nrc_word_counts$sentiment, levels = sentiment_overview$sentiment)
-nrc_word_counts
-```
 
-```{r message=FALSE, warning=FALSE}
 nrc_word_counts %>% 
   group_by(sentiment) %>% 
   top_n(8, n) %>% 
@@ -265,12 +284,11 @@ nrc_word_counts %>%
 
 ## Usage of Common Sentimental Words with Top Fifty FavoriteCount
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, echo=FALSE}
 # Preprocessing
-favorite <- df%>%
+favorite <- df %>%
   arrange(desc(favoriteCount)) %>%
   top_n(50)
-
 # Collecting Tweets Words
 reg <- "([^A-Za-z\\d#@']|'(?![A-Za-z\\d#@]))"
 favorite_words <- favorite %>%
@@ -281,34 +299,31 @@ favorite_words <- favorite %>%
            str_detect(word, "[a-z]")) %>%
     arrange(desc(favoriteCount))
 
-# View the difference between whole POTUS tweets and top 50 favorite tweets 
+# View the difference between whole @POTUS tweets and its top 50 favorite tweets 
 sentiment_overview_50 <- favorite_words %>%
     inner_join(get_sentiments("nrc")) %>%
     filter(!is.na(sentiment)) %>%
     count(sentiment, sort = TRUE)
-
 sentiment_overview_50
-
-sentiment_overview_50 %>% 
-  ggplot() + 
-  geom_bar(aes(x = reorder(sentiment, n), y = n), stat = "identity") +
-  labs(x = "sentiment", y = "count") + 
-  coord_flip()
 ```
 
 ```{r message=FALSE, warning=FALSE}
-nrc_word_counts <- favorite_words %>%
+favorite_word_counts <- favorite_words %>%
   inner_join(get_sentiments("nrc")) %>%
   count(word, sentiment, sort = TRUE) %>%
   ungroup()
 
-nrc_word_counts$sentiment = 
-  factor(nrc_word_counts$sentiment, levels = sentiment_overview_50$sentiment)
+favorite_word_counts$sentiment = 
+  factor(favorite_word_counts$sentiment, levels = sentiment_overview_50$sentiment)
 
-nrc_word_counts
 
-nrc_word_counts %>% 
+favorite_word_counts$sentiment = 
+  factor(favorite_word_counts$sentiment, levels = sentiment_overview_50$sentiment)
+
+favorite_word_counts %>% 
   filter(n > 1) %>%
+  group_by(sentiment) %>%
+  top_n(8, n) %>%
   ggplot() +
   geom_histogram(aes(x = reorder(word, n), y = n), stat = "identity", width = 0.75) +
   coord_flip() +
@@ -318,6 +333,7 @@ nrc_word_counts %>%
 ```
 
 ## Compared with @JoeBiden
+
 ```{r message=FALSE, warning=FALSE}
 reg <- "([^A-Za-z\\d#@']|'(?![A-Za-z\\d#@]))"
 tweet_words2 <- AllJoeBidenTweets %>%
@@ -328,27 +344,22 @@ tweet_words2 <- AllJoeBidenTweets %>%
            str_detect(word, "[a-z]")) %>%
     arrange(desc(likes))
     
-
 sentiment_counts <- tweet_words2 %>%
   left_join(get_sentiments("nrc")) %>%
   count(word, sentiment, sort = TRUE) %>%
   ungroup()
-
 sentiment_df = sentiment_counts %>% 
   group_by(sentiment) %>% 
   summarise(n = n()) %>% 
   arrange(desc(n)) %>% 
   ungroup()
-
 sentiment_df %>% 
   filter(!is.na(sentiment)) %>%
   ggplot() + 
   geom_bar(aes(x = n, y = reorder(sentiment, n)), stat = "identity") + 
   labs(x = "count", y = "sentiment")
-
 sentiment_counts$sentiment = 
   factor(sentiment_counts$sentiment, levels = sentiment_df$sentiment)
-
 sentiment_counts %>% 
   group_by(sentiment) %>% 
   top_n(8, n) %>% 
