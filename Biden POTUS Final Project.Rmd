@@ -179,7 +179,7 @@ WhiteHouse_periscope_ratios <- tweet_words %>%
 
 WhiteHouse_periscope_ratios %>%
   group_by(logratio > 0) %>%
-  top_n(8, abs(logratio)) %>%
+  top_n(5, abs(logratio)) %>%
   ungroup() %>%
   mutate(word = reorder(word, logratio)) %>%
   ggplot(aes(word, logratio, fill = logratio < 0)) +
