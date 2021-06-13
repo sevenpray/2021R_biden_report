@@ -687,7 +687,7 @@ div.tocify {
 <ul>
 <li><code>positive/trust</code>: <code>rescue/vaccine/economy</code></li>
 <li><code>anticipation</code>: <code>plan</code></li>
-<li><code>negative/fear/sadness/anger</code>: <code>pandemic/gun/tax</code></li>
+<li><code>negative/fear/sadness/anger</code>: <code>pandemic/tax</code></li>
 </ul>
 <p>其他大部分的詞彙則無法分辨是否具備特別意義。</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>nrc_word_counts <span class="ot">&lt;-</span> tweet_words <span class="sc">%&gt;%</span></span>
@@ -774,6 +774,7 @@ div.tocify {
 </div>
 <div id="compared-with-joebiden" class="section level2" number="4.5">
 <h2 number="4.5"><span class="header-section-number">4.5</span> Compared with <span class="citation">@JoeBiden</span></h2>
+<p><code>@JoeBiden</code>截至2020年11月使用<code>positive</code>與<code>negative</code>類別詞彙的傾向不相上下，而且兩者的使用量皆遠多過其他情緒類別。<code>trust/fear/anger/sadness</code>等情緒類別則差距不大，這代表<code>@JoeBiden</code>在情緒傳達上的複雜程度遠大於<code>@POTUS</code>。<code>@POTUS</code>只傾向傳達正面情緒，但<code>@JoeBiden</code>都會使用。</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>reg <span class="ot">&lt;-</span> <span class="st">&quot;([^A-Za-z</span><span class="sc">\\</span><span class="st">d#@&#39;]|&#39;(?![A-Za-z</span><span class="sc">\\</span><span class="st">d#@]))&quot;</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>tweet_words2 <span class="ot">&lt;-</span> AllJoeBidenTweets <span class="sc">%&gt;%</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">str_detect</span>(tweet, <span class="st">&#39;^&quot;&#39;</span>)) <span class="sc">%&gt;%</span></span>
@@ -809,6 +810,14 @@ div.tocify {
 ##  9 joy            260
 ## 10 disgust        220
 ## 11 surprise       171</code></pre>
+<p><code>@JoeBiden</code>在各情緒類別的字詞組成上，較為顯著的有:</p>
+<ul>
+<li><code>positive</code>: <code>president</code></li>
+<li><code>negative/fear/anger</code>: <code>crisis/violence/fight/gun</code></li>
+<li><code>surprise</code>: <code>trump</code></li>
+<li><code>other/NA</code>: <code>vote/donald</code></li>
+</ul>
+<p>即使資料擷取時間有涵蓋總統選舉期間，<code>@JoeBiden</code>除了選舉詞彙與人物詞彙之外(例如<code>president/vote/trump</code>)還是多使用模糊字眼。可以推論相較<code>@POTUS</code>，<code>@JoeBiden</code>更加的情緒化，而不傾向呈現具體政策意涵或社會事件。</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>sentiment_counts<span class="sc">$</span>sentiment <span class="ot">=</span> </span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">factor</span>(sentiment_counts<span class="sc">$</span>sentiment, <span class="at">levels =</span> sentiment_df<span class="sc">$</span>sentiment)</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -823,7 +832,7 @@ div.tocify {
 <span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(sentiment), <span class="at">scales =</span> <span class="st">&quot;free&quot;</span>) <span class="sc">+</span> </span>
 <span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="fu">rel</span>(<span class="fl">0.75</span>))) <span class="sc">+</span> </span>
 <span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Word&quot;</span>, <span class="at">y =</span> <span class="st">&quot;&quot;</span>, <span class="at">title =</span> <span class="st">&quot;Frequency of Occurrence by Sentiment&quot;</span>)</span></code></pre></div>
-<p><img src="Biden-POTUS-Final-Project_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p><img src="Biden-POTUS-Final-Project_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
 </div>
 </div>
 

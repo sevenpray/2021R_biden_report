@@ -264,7 +264,7 @@ by_source_sentiment
 
 - `positive/trust`: `rescue/vaccine/economy`
 - `anticipation`: `plan`
-- `negative/fear/sadness/anger`: `pandemic/gun/tax`
+- `negative/fear/sadness/anger`: `pandemic/tax`
 
 其他大部分的詞彙則無法分辨是否具備特別意義。
 
@@ -344,6 +344,8 @@ favorite_word_counts %>%
 
 ## Compared with @JoeBiden
 
+`@JoeBiden`截至2020年11月使用`positive`與`negative`類別詞彙的傾向不相上下，而且兩者的使用量皆遠多過其他情緒類別。`trust/fear/anger/sadness`等情緒類別則差距不大，這代表`@JoeBiden`在情緒傳達上的複雜程度遠大於`@POTUS`。`@POTUS`只傾向傳達正面情緒，但`@JoeBiden`都會使用。
+
 ```{r message=FALSE, warning=FALSE}
 reg <- "([^A-Za-z\\d#@']|'(?![A-Za-z\\d#@]))"
 tweet_words2 <- AllJoeBidenTweets %>%
@@ -366,7 +368,19 @@ sentiment_df <-  sentiment_counts %>%
   ungroup()
 
 sentiment_df
+```
 
+
+`@JoeBiden`在各情緒類別的字詞組成上，較為顯著的有:
+
+- `positive`: `president`
+- `negative/fear/anger`: `crisis/violence/fight/gun`
+- `surprise`: `trump`
+- `other/NA`: `vote/donald`
+
+即使資料擷取時間有涵蓋總統選舉期間，`@JoeBiden`除了選舉詞彙與人物詞彙之外(例如`president/vote/trump`)還是多使用模糊字眼。可以推論相較`@POTUS`，`@JoeBiden`更加的情緒化，而不傾向呈現具體政策意涵或社會事件。
+
+```{r message=FALSE, warning=FALSE}
 sentiment_counts$sentiment = 
   factor(sentiment_counts$sentiment, levels = sentiment_df$sentiment)
 
