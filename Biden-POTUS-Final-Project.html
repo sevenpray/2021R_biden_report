@@ -621,9 +621,10 @@ div.tocify {
 </div>
 <div id="sentiment-analysis" class="section level1" number="4">
 <h1 number="4"><span class="header-section-number">4</span> Sentiment Analysis</h1>
-<p>最後情緒分析的環節</p>
+<p>最後情緒分析的環節，我們想要知道<code>@POTUS</code>的文字使用在情緒上表現，包含較常傳達哪些情緒、以及不同類別的情緒傳達分別由哪字詞組成。對此，我們採用<code>library(textdata)</code>中的<code>get_sentiments()</code>獲取<code>NRC Word-Emotion Association lexicon</code>，將<code>POTUS</code>使用的英文單詞分成十種情緒類別，比較<code>@POTUS</code>跟<code>@JoeBiden</code>的差異。</p>
 <div id="tweets-sentiment-overview" class="section level2" number="4.1">
 <h2 number="4.1"><span class="header-section-number">4.1</span> Tweets Sentiment Overview</h2>
+<p><code>@POTUS</code>整體較常使用正面的情緒字眼，包含<code>positive/trust</code>，以及中性的<code>anticipation</code>。</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>sentiment_overview <span class="ot">&lt;-</span> tweet_words <span class="sc">%&gt;%</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">inner_join</span>(<span class="fu">get_sentiments</span>(<span class="st">&quot;nrc&quot;</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(sentiment)) <span class="sc">%&gt;%</span></span>
@@ -646,22 +647,25 @@ div.tocify {
 </div>
 <div id="tweets-sentiment-by-source" class="section level2" number="4.2">
 <h2 number="4.2"><span class="header-section-number">4.2</span> Tweets Sentiment by Source</h2>
+<p><code>@POTUS</code>每種發文來源的情緒傾向都類似。</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sources <span class="ot">&lt;-</span> tweet_words <span class="sc">%&gt;%</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(source) <span class="sc">%&gt;%</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">total_words =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>(id, source, total_words)</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>by_source_sentiment <span class="ot">&lt;-</span> tweet_words <span class="sc">%&gt;%</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">inner_join</span>(<span class="fu">get_sentiments</span>(<span class="st">&quot;nrc&quot;</span>), <span class="at">by =</span> <span class="st">&quot;word&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(sentiment, id) <span class="sc">%&gt;%</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">complete</span>(sentiment, id, <span class="at">fill =</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">inner_join</span>(sources) <span class="sc">%&gt;%</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(source, sentiment, total_words) <span class="sc">%&gt;%</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">words =</span> <span class="fu">sum</span>(n)) <span class="sc">%&gt;%</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(total_words)) <span class="sc">%&gt;%</span></span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>()</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>by_source_sentiment</span></code></pre></div>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>by_source_sentiment <span class="ot">&lt;-</span> tweet_words <span class="sc">%&gt;%</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">inner_join</span>(<span class="fu">get_sentiments</span>(<span class="st">&quot;nrc&quot;</span>), <span class="at">by =</span> <span class="st">&quot;word&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(sentiment, id) <span class="sc">%&gt;%</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">complete</span>(sentiment, id, <span class="at">fill =</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">inner_join</span>(sources) <span class="sc">%&gt;%</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(source, sentiment, total_words) <span class="sc">%&gt;%</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">words =</span> <span class="fu">sum</span>(n)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(total_words)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>()</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>by_source_sentiment</span></code></pre></div>
 <pre><code>## # A tibble: 50 x 4
 ##    source          sentiment    total_words words
 ##    &lt;chr&gt;           &lt;chr&gt;              &lt;int&gt; &lt;dbl&gt;
@@ -679,6 +683,13 @@ div.tocify {
 </div>
 <div id="usage-of-common-sentimental-words" class="section level2" number="4.3">
 <h2 number="4.3"><span class="header-section-number">4.3</span> Usage of Common Sentimental Words</h2>
+<p>綜合各情緒類別的字詞組成，可以發現出現頻率較高且具備政策意涵的詞彙有:</p>
+<ul>
+<li><code>positive/trust</code>: <code>rescue/vaccine/economy</code></li>
+<li><code>anticipation</code>: <code>plan</code></li>
+<li><code>negative/fear/sadness/anger</code>: <code>pandemic/gun/tax</code></li>
+</ul>
+<p>其他大部分的詞彙則無法分辨是否具備特別意義。</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>nrc_word_counts <span class="ot">&lt;-</span> tweet_words <span class="sc">%&gt;%</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(<span class="fu">get_sentiments</span>(<span class="st">&quot;nrc&quot;</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(word, sentiment, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
@@ -706,22 +717,24 @@ div.tocify {
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>favorite <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(favoriteCount)) <span class="sc">%&gt;%</span></span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">50</span>)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Collecting Tweets Words</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>reg <span class="ot">&lt;-</span> <span class="st">&quot;([^A-Za-z</span><span class="sc">\\</span><span class="st">d#@&#39;]|&#39;(?![A-Za-z</span><span class="sc">\\</span><span class="st">d#@]))&quot;</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>favorite_words <span class="ot">&lt;-</span> favorite <span class="sc">%&gt;%</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">str_detect</span>(text, <span class="st">&#39;^&quot;&#39;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">str_replace_all</span>(text, <span class="st">&quot;https://t.co/[A-Za-z</span><span class="sc">\\</span><span class="st">d]+|&amp;amp;&quot;</span>, <span class="st">&quot;&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unnest_tokens</span>(word, text, <span class="at">token =</span> <span class="st">&quot;regex&quot;</span>, <span class="at">pattern =</span> reg) <span class="sc">%&gt;%</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span>word <span class="sc">%in%</span> stop_words<span class="sc">$</span>word,</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>           <span class="fu">str_detect</span>(word, <span class="st">&quot;[a-z]&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(favoriteCount))</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="co"># View the difference between whole @POTUS tweets and its top 50 favorite tweets </span></span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>sentiment_overview_50 <span class="ot">&lt;-</span> favorite_words <span class="sc">%&gt;%</span></span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">inner_join</span>(<span class="fu">get_sentiments</span>(<span class="st">&quot;nrc&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(sentiment)) <span class="sc">%&gt;%</span></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(sentiment, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>sentiment_overview_50</span></code></pre></div>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Collecting Tweets Words</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>reg <span class="ot">&lt;-</span> <span class="st">&quot;([^A-Za-z</span><span class="sc">\\</span><span class="st">d#@&#39;]|&#39;(?![A-Za-z</span><span class="sc">\\</span><span class="st">d#@]))&quot;</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>favorite_words <span class="ot">&lt;-</span> favorite <span class="sc">%&gt;%</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">str_detect</span>(text, <span class="st">&#39;^&quot;&#39;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">str_replace_all</span>(text, <span class="st">&quot;https://t.co/[A-Za-z</span><span class="sc">\\</span><span class="st">d]+|&amp;amp;&quot;</span>, <span class="st">&quot;&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unnest_tokens</span>(word, text, <span class="at">token =</span> <span class="st">&quot;regex&quot;</span>, <span class="at">pattern =</span> reg) <span class="sc">%&gt;%</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span>word <span class="sc">%in%</span> stop_words<span class="sc">$</span>word,</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>           <span class="fu">str_detect</span>(word, <span class="st">&quot;[a-z]&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(favoriteCount))</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="co"># View the difference between whole @POTUS tweets and its top 50 favorite tweets </span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>sentiment_overview_50 <span class="ot">&lt;-</span> favorite_words <span class="sc">%&gt;%</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">inner_join</span>(<span class="fu">get_sentiments</span>(<span class="st">&quot;nrc&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(sentiment)) <span class="sc">%&gt;%</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(sentiment, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>sentiment_overview_50</span></code></pre></div>
 <pre><code>## # A tibble: 10 x 2
 ##    sentiment        n
 ##    &lt;chr&gt;        &lt;int&gt;

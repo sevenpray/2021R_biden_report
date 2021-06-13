@@ -218,9 +218,11 @@ Sentiment Analysis
 ====================
 
 
-最後情緒分析的環節
+最後情緒分析的環節，我們想要知道`@POTUS`的文字使用在情緒上表現，包含較常傳達哪些情緒、以及不同類別的情緒傳達分別由哪字詞組成。對此，我們採用`library(textdata)`中的`get_sentiments()`獲取`NRC Word-Emotion Association lexicon`，將`POTUS`使用的英文單詞分成十種情緒類別，比較`@POTUS`跟`@JoeBiden`的差異。
 
 ## Tweets Sentiment Overview
+
+`@POTUS`整體較常使用正面的情緒字眼，包含`positive/trust`，以及中性的`anticipation`。
 
 ```{r message=FALSE, warning=FALSE}
 sentiment_overview <- tweet_words %>%
@@ -233,12 +235,15 @@ sentiment_overview
 
 ## Tweets Sentiment by Source
 
+`@POTUS`每種發文來源的情緒傾向都類似。
+
 ```{r message=FALSE, warning=FALSE}
 sources <- tweet_words %>%
     group_by(source) %>%
     mutate(total_words = n()) %>%
     ungroup() %>%
     distinct(id, source, total_words)
+
 by_source_sentiment <- tweet_words %>%
     inner_join(get_sentiments("nrc"), by = "word") %>%
     count(sentiment, id) %>%
@@ -249,10 +254,19 @@ by_source_sentiment <- tweet_words %>%
     summarize(words = sum(n)) %>%
     arrange(desc(total_words)) %>%
     ungroup()
+
 by_source_sentiment
 ```
 
 ## Usage of Common Sentimental Words
+
+綜合各情緒類別的字詞組成，可以發現出現頻率較高且具備政策意涵的詞彙有:
+
+- `positive/trust`: `rescue/vaccine/economy`
+- `anticipation`: `plan`
+- `negative/fear/sadness/anger`: `pandemic/gun/tax`
+
+其他大部分的詞彙則無法分辨是否具備特別意義。
 
 ```{r message=FALSE, warning=FALSE}
 nrc_word_counts <- tweet_words %>%
@@ -283,6 +297,7 @@ nrc_word_counts %>%
 favorite <- df %>%
   arrange(desc(favoriteCount)) %>%
   top_n(50)
+
 # Collecting Tweets Words
 reg <- "([^A-Za-z\\d#@']|'(?![A-Za-z\\d#@]))"
 favorite_words <- favorite %>%
@@ -298,6 +313,7 @@ sentiment_overview_50 <- favorite_words %>%
     inner_join(get_sentiments("nrc")) %>%
     filter(!is.na(sentiment)) %>%
     count(sentiment, sort = TRUE)
+
 sentiment_overview_50
 ```
 
