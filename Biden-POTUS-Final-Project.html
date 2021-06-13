@@ -774,7 +774,7 @@ div.tocify {
 </div>
 <div id="compared-with-joebiden" class="section level2" number="4.5">
 <h2 number="4.5"><span class="header-section-number">4.5</span> Compared with <span class="citation">@JoeBiden</span></h2>
-<p><code>@JoeBiden</code>截至2020年11月使用<code>positive</code>與<code>negative</code>類別詞彙的傾向不相上下，而且兩者的使用量皆遠多過其他情緒類別。<code>trust/fear/anger/sadness</code>等情緒類別則差距不大，這代表<code>@JoeBiden</code>在情緒傳達上的複雜程度遠大於<code>@POTUS</code>。<code>@POTUS</code>只傾向傳達正面情緒，但<code>@JoeBiden</code>都會使用。</p>
+<p><code>@JoeBiden</code>截至2020年11月使用<code>positive</code>與<code>negative</code>類別詞彙的傾向不相上下，而且兩者的使用量皆遠多過其他情緒類別。<code>trust/fear/anger/sadness</code>等情緒類別則差距不大。 這代表<code>@JoeBiden</code>在情緒傳達上的複雜程度遠大於<code>@POTUS</code>。<code>@POTUS</code>只傾向傳達正面情緒，但<code>@JoeBiden</code>都會使用。</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>reg <span class="ot">&lt;-</span> <span class="st">&quot;([^A-Za-z</span><span class="sc">\\</span><span class="st">d#@&#39;]|&#39;(?![A-Za-z</span><span class="sc">\\</span><span class="st">d#@]))&quot;</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>tweet_words2 <span class="ot">&lt;-</span> AllJoeBidenTweets <span class="sc">%&gt;%</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">str_detect</span>(tweet, <span class="st">&#39;^&quot;&#39;</span>)) <span class="sc">%&gt;%</span></span>

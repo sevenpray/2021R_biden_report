@@ -344,7 +344,8 @@ favorite_word_counts %>%
 
 ## Compared with @JoeBiden
 
-`@JoeBiden`截至2020年11月使用`positive`與`negative`類別詞彙的傾向不相上下，而且兩者的使用量皆遠多過其他情緒類別。`trust/fear/anger/sadness`等情緒類別則差距不大，這代表`@JoeBiden`在情緒傳達上的複雜程度遠大於`@POTUS`。`@POTUS`只傾向傳達正面情緒，但`@JoeBiden`都會使用。
+`@JoeBiden`截至2020年11月使用`positive`與`negative`類別詞彙的傾向不相上下，而且兩者的使用量皆遠多過其他情緒類別。`trust/fear/anger/sadness`等情緒類別則差距不大。
+這代表`@JoeBiden`在情緒傳達上的複雜程度遠大於`@POTUS`。`@POTUS`只傾向傳達正面情緒，但`@JoeBiden`都會使用。
 
 ```{r message=FALSE, warning=FALSE}
 reg <- "([^A-Za-z\\d#@']|'(?![A-Za-z\\d#@]))"
