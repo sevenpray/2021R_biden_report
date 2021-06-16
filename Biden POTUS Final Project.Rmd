@@ -194,6 +194,7 @@ WhiteHouse_periscope_ratios <- tweet_words %>%
   mutate_each(funs((. + 1) / sum(. + 1)), -word) %>%
   mutate(logratio = log2(The_White_House / Periscope)) %>%
   arrange(desc(logratio))
+
 WhiteHouse_periscope_ratios %>%
   group_by(logratio > 0) %>%
   top_n(8, abs(logratio)) %>%
