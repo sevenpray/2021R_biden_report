@@ -9,6 +9,7 @@ output:
         toc: yes
         toc_float:
             collapsed: no
+        css: style.css
 ---
 
 ```{r setup, include=FALSE}
