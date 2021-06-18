@@ -1,7 +1,7 @@
 ---
 title: "From @JoeBiden to @POTUS"
 author: "組員：簡郁展, 潘立恆, 邱繼賢, 劉慧新, 陳暘"
-date: "2021/6/8"
+date: "2021/6/18"
 output: 
     html_document:
         number_sections: yes
@@ -113,7 +113,7 @@ General Analysis
 - `Sprinklr`也只有5篇貼文，但`favoriteCount/retweetCount`前10名的推文中，就有3篇來自`Sprinklr`。
 - 但這些現象都只發生在一月拜登剛就職總統的時候。
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 ggplot(data = df) + 
     geom_col(mapping = aes(x = created, y = retweetCount, color = source, fill = source))
 
