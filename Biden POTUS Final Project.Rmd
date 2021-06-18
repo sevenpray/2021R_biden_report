@@ -47,7 +47,7 @@ library(cowplot)
 
 ## Collecting Data and Preprocessing
 
-資料取得與資料前處理：從`Twitter API`與`twitteR()`的`userTimeline()`函數載入推文擷取資料，並轉換成data frame，時間跨度涵蓋拜登`@POTUS`帳號截止至2021年6月13日共760筆，另有從`Kaggle`抓取`@JoeBiden`現成資料。之後將取得的的data frame整理出我們需要的變數。
+資料取得與資料前處理：從`Twitter API`與`twitteR()`的`userTimeline()`函數載入推文擷取資料，並轉換成data frame，時間跨度涵蓋拜登`@POTUS`帳號截止至2021年6月13日共760筆，另有從`Kaggle`抓取`@JoeBiden`現成資料。之後將取得的data frame整理出我們需要的變數。
 
 ```{r message=FALSE, warning=FALSE}
 # Need apikey and token available from Twitter API:
@@ -79,7 +79,7 @@ df <- biden_tweets_df %>%
 - 我們用`unnest_tokens()`從`text`斷詞並去掉停詞，得到`tweet_words`的data frame，主要用於文字分析與情緒分析。
 - 本專案希望先呈現`@POTUS`在時間資料上的表現，了解其整體發文動態。接著進入推文內容進行文字與情緒分析。最終嘗試回答我們在`Problematic`中的提問。
 
-後面的個段落會一邊進行程式碼的說明，同時呈現觀察結果。
+後面的各段落會一邊進行程式碼的說明，同時呈現觀察結果。
 
 ```{r message=FALSE, warning=FALSE}
 # Extracting tweet words
@@ -301,7 +301,7 @@ by_source_sentiment
 
 ## Usage of Common Sentimental Words
 
-看完情緒使用次數與發文來源的情緒傾向之後，我們想要知道到底是哪些字組組成這些情緒的表達。綜合各情緒類別的字詞組成，可以發現出現頻率較高且具備政策意涵的詞彙有:
+看完情緒使用次數與發文來源的情緒傾向之後，我們想要知道到底是哪些字詞組成這些情緒的表達。綜合各情緒類別的字詞組成，可以發現出現頻率較高且具備政策意涵的詞彙有:
 
 - `positive/trust`: `rescue/vaccine/economy`
 - `anticipation`: `plan`
