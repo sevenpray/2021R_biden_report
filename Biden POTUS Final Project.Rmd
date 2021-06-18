@@ -2,14 +2,14 @@
 title: "From @JoeBiden to @POTUS"
 author: "組員：簡郁展, 潘立恆, 邱繼賢, 劉慧新, 陳暘"
 date: "2021/6/18"
-output: 
-    html_document:
-        number_sections: yes
-        highlight: tango
-        toc: yes
-        toc_float:
-            collapsed: no
-        css: style.css
+output:
+  html_document:
+    number_sections: yes
+    highlight: tango
+    toc: yes
+    toc_float:
+      collapsed: no
+    css: style.css
 ---
 
 ```{r setup, include=FALSE}
@@ -368,7 +368,7 @@ sentiment_df
 - `surprise`: `trump`
 - `other/NA`: `vote/donald`
 
-即使資料擷取時間有涵蓋總統選舉期間，`@JoeBiden`除了選舉詞彙與人物詞彙之外(例如`president/vote/trump`)還是多使用模糊字眼。即使我們加入不會被情緒詞表算進去的NA值去看，還是觀察不到政策辨識度比較高的單詞。**可以推論相較`@POTUS`，`@JoeBiden`更加的情緒化，而不傾向呈現具體政策意涵或社會事件，而@POTUS單純就是一個政策導向的帳號。**
+即使資料擷取時間有涵蓋總統選舉期間，`@JoeBiden`除了選舉詞彙與人物詞彙之外(例如`president/vote/trump`)還是多使用模糊字眼。即使我們加入不會被情緒詞表算進去的NA值去看，還是觀察不到政策辨識度比較高的單詞。**可以推論相較`@POTUS`，`@JoeBiden`更加的情緒化，而不傾向呈現具體政策意涵或社會事件，而`@POTUS`單純就是一個政策導向的帳號。**
 
 ```{r message=FALSE, warning=FALSE}
 sentiment_counts$sentiment = 
