@@ -171,7 +171,7 @@ plot_grid(p1, p2, p3, p4, ncol = 2)
 
 `@POTUS`的推文幾乎都附有照片或連結，差距非常顯著。藉由直接觀察拜登的推文，以及推文附帶的文字敘述進而推論這些圖片或連結多與特定會議、政策或社會事件有關。(詳參`Comparison of Words`)
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 # Whether a Picture/Link is likely to be included in a Tweet
 # Detect regex with "t.co" in the "text" column
 
