@@ -768,24 +768,7 @@ sentiment_df</code></pre></div>
 <li><code>surprise</code>: <code>trump</code></li>
 <li><code>other/NA</code>: <code>vote/donald</code></li>
 </ul>
-<<<<<<< HEAD
 <p>即使資料擷取時間有涵蓋總統選舉期間，<code>@JoeBiden</code>除了選舉詞彙與人物詞彙之外(例如<code>president/vote/trump</code>)還是多使用模糊字眼。即使我們加入不會被情緒詞表算進去的NA值去看，還是觀察不到政策辨識度比較高的單詞。<strong>可以推論相較<code>@POTUS</code>，<code>@JoeBiden</code>更加的情緒化，而不傾向呈現具體政策意涵或社會事件，而<code>@POTUS</code>單純就是一個政策導向的帳號。</strong></p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>sentiment_counts<span class="sc">$</span>sentiment <span class="ot">=</span> </span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">factor</span>(sentiment_counts<span class="sc">$</span>sentiment, <span class="at">levels =</span> sentiment_df<span class="sc">$</span>sentiment)</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>sentiment_counts <span class="sc">%&gt;%</span> </span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sentiment) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">8</span>, n) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(n)) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(word, n), <span class="at">y =</span> n), <span class="at">stat =</span> <span class="st">&quot;identity&quot;</span>, <span class="at">width =</span> <span class="fl">0.75</span>) <span class="sc">+</span></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(sentiment), <span class="at">scales =</span> <span class="st">&quot;free&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="fu">rel</span>(<span class="fl">0.75</span>))) <span class="sc">+</span> </span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Word&quot;</span>, <span class="at">y =</span> <span class="st">&quot;&quot;</span>, <span class="at">title =</span> <span class="st">&quot;Frequency of Occurrence by Sentiment&quot;</span>)</span></code></pre></div>
-=======
-<p>即使資料擷取時間有涵蓋總統選舉期間，<code>@JoeBiden</code>除了選舉詞彙與人物詞彙之外(例如<code>president/vote/trump</code>)還是多使用模糊字眼。即使我們加入不會被情緒詞表算進去的NA值去看，還是觀察不到政策辨識度比較高的單詞。<strong>可以推論相較<code>@POTUS</code>，<code>@JoeBiden</code>更加的情緒化，而不傾向呈現具體政策意涵或社會事件，<a href="mailto:而@POTUS單純就是一個政策導向的帳號">而@POTUS單純就是一個政策導向的帳號</a>。</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sentiment_counts<span class="op">$</span>sentiment =<span class="st"> </span>
 <span class="st">  </span><span class="kw">factor</span>(sentiment_counts<span class="op">$</span>sentiment, <span class="dt">levels =</span> sentiment_df<span class="op">$</span>sentiment)
 
@@ -800,7 +783,6 @@ sentiment_counts <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">facet_wrap</span>(<span class="kw">vars</span>(sentiment), <span class="dt">scales =</span> <span class="st">&quot;free&quot;</span>) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.y =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="kw">rel</span>(<span class="fl">0.75</span>))) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Word&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;&quot;</span>, <span class="dt">title =</span> <span class="st">&quot;Frequency of Occurrence by Sentiment&quot;</span>)</code></pre></div>
->>>>>>> 8a251a0d63141e1288d4c9ac9cdcda35d2b22c8c
 <p><img src="Biden-POTUS-Final-Project_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 </div>
 </div>
