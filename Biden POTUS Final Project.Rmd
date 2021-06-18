@@ -99,13 +99,13 @@ General Analysis
 ====================
 
 
-## Time line
+## Timeline
 
 對`@POTUS`從2月到六月的發文狀況做總覽，觀察不同發文來源在`favoriteCount 以及 retweetCount`的表現。
 
 =======
 
-### Time line of retweetCount and FavoriteCount from Feb to June
+### Timeline of retweetCount and FavoriteCount from Feb to June
 
 下面兩張圖可以明顯看出大部分推文都是從`The White House` 發出來的，而`favoriteCount`的數量級大致上為`retweetCount`的十倍，兩者趨勢大體上相同。
 
